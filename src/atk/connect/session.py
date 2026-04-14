@@ -123,7 +123,14 @@ class ATKConnection:
         # 规范化路径
         obj_path = utils.resolve_path(obj_path)
 
-        result = _ATK.atkConnect(self.con_id, command, obj_path, param)
+        # ATK Connect 协议：atkConnect(conID, command, inputStr)
+        # 其中 inputStr = "obj_path param"，两者必须合并为一个字符串
+        input_str = f"{obj_path} {param}".strip()
+        result = _ATK.atkConnect(self.con_id, command, input_str)
+
+        # 打印命令发送和响应，便于调试
+        print(f"[ATK] --> {command} {obj_path!r} {param!r}")
+        print(f"[ATK] <-- {result!r}")
 
         # atkConnect() 可能返回 str（如 "NACK"、"ACK"）或 CMDRESULT — 两种都要处理
         if isinstance(result, str):

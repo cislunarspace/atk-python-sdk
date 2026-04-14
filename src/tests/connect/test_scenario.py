@@ -34,8 +34,9 @@ class TestScenarioBuilder:
         builder = ScenarioBuilder(conn, "MyScenario")
         builder.create()
 
-        # ATK 格式：obj='*', param=' Scenario {name}'
-        assert ("New", "*", " Scenario MyScenario") in conn.calls
+        # ATK 格式：obj='/', param=' Scenario {name}'
+        # 合并后：'/ Scenario {name}'
+        assert ("New", "/", " Scenario MyScenario") in conn.calls
 
     def test_set_analysis_period(self) -> None:
         from atk.connect.scenario import ScenarioBuilder

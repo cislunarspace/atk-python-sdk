@@ -23,7 +23,7 @@ class TestATKConnectionSend:
             conn = ATKConnection(con_id=123, host="127.0.0.1", port=6655)
             result = conn.send("New", "*/Scenario/Sc1", "")
 
-            mock_atk.atkConnect.assert_called_once_with(123, "New", "*/Scenario/Sc1", "")
+            mock_atk.atkConnect.assert_called_once_with(123, "New", "*/Scenario/Sc1")
             assert result is mock_result
 
     def test_send_normalises_path(self) -> None:
@@ -36,7 +36,7 @@ class TestATKConnectionSend:
             conn = ATKConnection(con_id=1, host="127.0.0.1", port=6655)
             conn.send("New", "Satellite/Sat1", "")
 
-            mock_atk.atkConnect.assert_called_once_with(1, "New", "*/Satellite/Sat1", "")
+            mock_atk.atkConnect.assert_called_once_with(1, "New", "*/Satellite/Sat1")
 
     def test_send_raises_when_closed(self) -> None:
         from atk.connect.session import ATKConnection

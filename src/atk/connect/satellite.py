@@ -85,9 +85,9 @@ class SatelliteBuilder:
         """
         在 ATK 中创建卫星对象。
 
-        使用 ATK 格式：``New / Satellite {name}``，obj='*'。
+        使用 ATK 格式：``New / Satellite {name}``，obj='/'。
         """
-        self._conn.send("New", "*", f" Satellite {self._name}")
+        self._conn.send("New", "/", f" Satellite {self._name}")
         return self
 
     # ------------------------------------------------------------------

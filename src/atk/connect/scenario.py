@@ -66,10 +66,11 @@ class ScenarioBuilder:
         -------
         self
         """
-        # ATK New 命令格式：obj='*', param=' Scenario {name}'
+        # ATK New 命令格式：obj='/', param=' Scenario {name}'
+        # 合并后：'/ Scenario {name}'
         # 如果场景已加载，NACK 是预期行为 — 无需处理。
         try:
-            self._conn.send("New", "*", f" Scenario {self._name}")
+            self._conn.send("New", "/", f" Scenario {self._name}")
         except _ex.ATKCommandError:
             # 场景已存在；直接使用
             pass

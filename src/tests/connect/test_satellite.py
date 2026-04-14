@@ -29,8 +29,9 @@ class TestSatelliteBuilder:
         sat = SatelliteBuilder(conn, "Sat1")
         sat.create()
 
-        # ATK 格式：obj='*', param=' Satellite {name}'
-        assert ("New", "*", " Satellite Sat1") in conn.calls
+        # ATK 格式：obj='/', param=' Satellite {name}'
+        # 合并后：'/ Satellite {name}'
+        assert ("New", "/", " Satellite Sat1") in conn.calls
 
     def test_set_propagator(self) -> None:
         from atk.connect.satellite import SatelliteBuilder

@@ -141,8 +141,8 @@ class WalkerBuilder:
         if self._created:
             return self
 
-        # 创建星座容器：New / Constellation/{name}，obj='*'
-        self._conn.send("New", "*", f" Constellation/{self._name}")
+        # 创建星座容器：New / Constellation/{name}，obj='/'
+        self._conn.send("New", "/", f" Constellation/{self._name}")
         self._created = True
 
         sats_per_plane = self._num_satellites // self._num_planes
@@ -164,8 +164,8 @@ class WalkerBuilder:
             sat_name = f"{self._name}_P{plane_idx}_S{intra_plane_idx}"
             sat_path = f"*/Constellation/{self._name}/Satellite/{sat_name}"
 
-            # 创建卫星：New / Satellite {name}，obj='*'
-            self._conn.send("New", "*", f" Satellite {sat_name}")
+            # 创建卫星：New / Satellite {name}，obj='/'（在星座根目录下创建）
+            self._conn.send("New", "/", f" Satellite {sat_name}")
 
             # 通过 SetState Classical {prop} 设置开普勒元素
             stop = epoch
