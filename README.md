@@ -108,6 +108,10 @@ atk-python-sdk/
 │   │       ├── satellite.py    # SatelliteBuilder (ISatellite wrapper)
 │   │       ├── mcs.py          # McsBuilder (IVADriverMCS wrapper)
 │   │       └── reports.py       # ReportExporter
+│   ├── vendored/              # ATK-provided SWIG bindings (sibling of atk/)
+│   │   ├── ATKConnectModule.py  # SWIG Python wrapper
+│   │   ├── _ATKConnectModule.pyd  # Windows native DLL
+│   │   └── _ATKConnectModule.so  # Linux native DLL
 │   └── tests/                  # Test suite (51 tests)
 │       ├── test_utils.py
 │       └── connect/
@@ -115,12 +119,6 @@ atk-python-sdk/
 │           ├── test_scenario.py
 │           ├── test_satellite.py
 │           └── test_mcs.py
-│
-├── vendored/                    # ATK-provided SWIG bindings
-│   ├── __init__.py             # Re-exports ATKConnectModule
-│   ├── ATKConnectModule.py     # SWIG Python wrapper
-│   ├── _ATKConnectModule.pyd   # Windows native DLL
-│   └── _ATKConnectModule.so   # Linux native DLL
 │
 ├── examples/
 │   ├── connect/
