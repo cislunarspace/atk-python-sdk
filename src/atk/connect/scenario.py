@@ -139,12 +139,14 @@ class ScenarioBuilder:
         -------
         self
         """
-        # 规范化路径：使用 '*' 表示全局（无特定场景）
+        # ATK 格式：SetAnalysisTimePeriod * "start" "stop"
         self._conn.send(
             "SetAnalysisTimePeriod",
             "*",
             f' "{start}" "{stop}"',
         )
+        # 修改时间段后必须重置动画时间线
+        self._conn.send("Animate", "*", " Reset")
         return self
 
     def set_analysis_mode(
