@@ -48,17 +48,17 @@ class McsBuilder:
         Build and register the next segment's property path.
 
         Example path:
-        ``*/Satellite/Sat1/MainSequence.SegmentList.Segment_0.Initial_State.InitialState.Keplerian``
+        ``MainSequence.SegmentList.Segment_0.Initial_State.InitialState.Keplerian``
         """
         idx = self._seg_index
         self._seg_index += 1
         # Segment list format: Segment_<index>.<SegmentType>.<SegmentType>
+        # (relative to sat_path, no leading slash)
         base = (
-            f"{self._sat_path}"
-            f"/MainSequence.SegmentList"
+            f"MainSequence.SegmentList"
             f".Segment_{idx}.{seg_type}"
         )
-        self._seg_paths.append(base)
+        self._seg_paths.append(f"{self._sat_path}/{base}")
         return base
 
     def _set(self, seg_path: str, property_name: str, value: str) -> None:

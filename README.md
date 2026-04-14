@@ -1,7 +1,13 @@
 # ATK Python SDK
 
-High-level Python wrappers for [ATK (Analytical Toolkit)](https://www.analytickit.com))
-supporting two operation modes:
+High-level Python wrappers for [ATK (Aerospace Tool Kit)](https://www.osredm.com/atknudt/atk/about).
+
+This is a **third-party** ATK Python SDK that complements and extends the official ATK Python client. It provides:
+
+- Builder pattern for fluent API
+- Complete exception hierarchy
+- Orbital mechanics utilities
+- Dual-mode architecture (Connect + Component)
 
 | Mode | Requires ATK GUI | How it works |
 |------|-----------------|--------------|
@@ -130,6 +136,23 @@ atk-python-sdk/
 ├── README.md
 ├── PLAN.md
 └── pyproject.toml
+```
+
+## Documentation
+
+详细文档请参考 [docs/](docs/index.md) 目录：
+
+- [快速开始](docs/guides/getting-started.md) — 5 分钟上手
+- [Connect 模式](docs/architecture/connect-mode.md) — TCP 连接和命令发送
+- [Component 模式](docs/architecture/component-mode.md) — DLL 直接加载
+- [轨道力学基础](docs/guides/orbital-mechanics-primer.md) — 理解示例代码中的公式
+- [ATK Connect 命令参考](docs/reference/atk-commands.md) — Connect 命令详细参考
+
+构建文档：
+
+```bash
+pip install -e ".[docs]"
+mkdocs serve
 ```
 
 ## Running Tests

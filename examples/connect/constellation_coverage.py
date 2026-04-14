@@ -31,12 +31,13 @@ def main() -> None:
         # ---------------------------------------------------------------
         # Create ground facility
         # ---------------------------------------------------------------
-        facility_path = "*/Facility/GroundStation"
-        atk.send("New", facility_path, "")
+        # ATK format: obj='*', param=' Facility/{name}'
+        atk.send("New", "*", " Facility/GroundStation")
+        # ATK format: obj='*/Facility/{name}', param=' Geodetic {lat} {lon} {height}'
         atk.send(
             "SetPosition",
-            facility_path,
-            ' LLA 40.0 -74.0 0.0',
+            "*/Facility/GroundStation",
+            " Geodetic 40.0 -74.0 0.0",
         )
         print("[3] Ground station created at (40°N, 74°W)")
 
@@ -50,7 +51,7 @@ def main() -> None:
             inc=53.0,
             alt=550.0,
         )
-        walker.set_propagator("PropagatorSGP4")
+        walker.set_propagator("PropagatorTwoBody")
         walker.build()
         print(f"[4] Walker Delta constellation built: {walker}")
 

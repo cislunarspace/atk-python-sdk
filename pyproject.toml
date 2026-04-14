@@ -29,10 +29,14 @@ dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
 ]
+docs = [
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.0",
+]
 
 [project.urls]
-Homepage = "https://github.com/your-org/atk-python-sdk"
-Documentation = "https://github.com/your-org/atk-python-sdk#readme"
+Homepage = "https://github.com/cislunarspace/atk-python-sdk"
+Documentation = "https://cislunarspace.github.io/atk-python-sdk"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -36,6 +36,7 @@ def main() -> None:
         # ---------------------------------------------------------------
         sat = atk.create_satellite("TransferVehicle")
         sat.set_propagator("PropagatorAstromaster")
+        sat.set_keplerian(sma=6678.0, ecc=0.0, inc=0.0, raan=0.0, argp=0.0, ta=0.0)
         print("[3] Satellite created: TransferVehicle")
 
         # ---------------------------------------------------------------

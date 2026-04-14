@@ -1,0 +1,52 @@
+site_name: ATK Python SDK 文档
+site_description: ATK (Aerospace Tool Kit) Python SDK 高层次封装文档
+site_author: ATK SDK Contributors
+repo_url: https://github.com/cislunarspace/atk-python-sdk
+
+theme:
+  name: material
+  language: zh
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: 切换深色模式
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: 切换浅色模式
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - content.code.copy
+
+nav:
+  - 首页: index.md
+  - 架构:
+    - Connect 模式: architecture/connect-mode.md
+    - Component 模式: architecture/component-mode.md
+    - 设计决策: architecture/design-decisions.md
+  - 背景知识:
+    - ATK 对象模型: background/atk-object-model.md
+    - 时间和单位: background/time-and-units.md
+    - Vendored 模块: background/vendored-modules.md
+  - 指南:
+    - 快速开始: guides/getting-started.md
+    - 轨道力学基础: guides/orbital-mechanics-primer.md
+    - 故障排查: guides/troubleshooting.md
+  - 参考:
+    - ATK Connect 命令: reference/atk-commands.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - toc:
+      permalink: true
