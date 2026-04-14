@@ -30,7 +30,11 @@ _PROPAGATOR_CMD_MAP = {
     "PropagatorJ4Perturbation": "J4Perturbation",
     "PropagatorVinti":         "Vinti",
     "PropagatorBallistic":     "Ballistic",
+    "PropagatorLOP":           "LOP",
 }
+
+# SetState Classical/Cartesian 支持的传播器（ATK 文档）
+_STATE_PROPAGATORS = {"TwoBody", "J2Perturbation", "J4Perturbation", "HPOP", "LOP"}
 
 
 class SatelliteBuilder:
@@ -107,10 +111,15 @@ class SatelliteBuilder:
             传播器名称。有效名称：
             ``PropagatorTwoBody``、``PropagatorJ2Perturbation``、
             ``PropagatorHPOP``、``PropagatorSGP4``（通过 TLE）、
-            ``PropagatorStkExternal``、``PropagatorAstromaster``、
-            ``PropagatorGreatArc``、``PropagatorSimpleAscent``、
-            ``PropagatorJ4Perturbation``、``PropagatorVinti``、
+            ``PropagatorStkExternal``、``PropagatorGreatArc``、
+            ``PropagatorSimpleAscent``、``PropagatorJ4Perturbation``、
+            ``PropagatorLOP``、``PropagatorVinti``、
             ``PropagatorBallistic``。
+
+        注意
+        ----
+        仅以下传播器可用于 ``set_keplerian`` / ``set_cartesian``：
+        ``TwoBody``、``J2Perturbation``、``J4Perturbation``、``HPOP``、``LOP``。
         """
         if propagator not in _PROPAGATOR_CMD_MAP:
             raise _ex.ATKValueError(
@@ -164,12 +173,18 @@ class SatelliteBuilder:
         if epoch is None:
             epoch = "1 Jan 2024 00:00:00.000"
         prop = self._propagator or "TwoBody"
+        if prop not in _STATE_PROPAGATORS:
+            raise _ex.ATKValueError(
+                f"Propagator {prop!r} is not valid for SetState Classical. "
+                f"Valid: {_STATE_PROPAGATORS}"
+            )
         stop = epoch  # 单点分析使用相同的历元作为开始和结束
         param = (
             f' Classical {prop} "{epoch}" "{stop}" '
             f'60 J2000 "{epoch}" {sma} {ecc} {inc} {raan} {argp} {ta}'
         )
         self._conn.send("SetState", self._path, param)
+        self._conn.send("Animate", "*", " Reset")
         return self
 
     def set_cartesian(
@@ -201,12 +216,47 @@ class SatelliteBuilder:
         if epoch is None:
             epoch = "1 Jan 2024 00:00:00.000"
         prop = self._propagator or "TwoBody"
+        if prop not in _STATE_PROPAGATORS:
+            raise _ex.ATKValueError(
+                f"Propagator {prop!r} is not valid for SetState Cartesian. "
+                f"Valid: {_STATE_PROPAGATORS}"
+            )
         stop = epoch
         param = (
             f' Cartesian {prop} "{epoch}" "{stop}" '
             f'60 J2000 "{epoch}" {x} {y} {z} {vx} {vy} {vz}'
         )
         self._conn.send("SetState", self._path, param)
+        self._conn.send("Animate", "*", " Reset")
+        return self
+
+    # ------------------------------------------------------------------
+    # 轨道状态 — TLE
+    # ------------------------------------------------------------------
+
+    def set_state_tle(
+        self,
+        line1: str,
+        line2: str,
+    ) -> "SatelliteBuilder":
+        """
+        使用 TLE（两行轨道根数）设置卫星状态。
+
+        ATK 会自动使用 SGP4 传播器解析 TLE 数据。
+
+        Parameters
+        ----------
+        line1 : str
+            TLE 第一行（69 字符）。
+        line2 : str
+            TLE 第二行（69 字符）。
+
+        Returns
+        -------
+        self
+        """
+        self._conn.send("SetState", self._path, f' TLE "{line1}" "{line2}"')
+        self._conn.send("Animate", "*", " Reset")
         return self
 
     # ------------------------------------------------------------------

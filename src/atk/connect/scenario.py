@@ -90,9 +90,11 @@ class ScenarioBuilder:
         self
         """
         if path:
-            self._conn.send("Save", self._path, f' "{path}"')
+            # SaveAs / * "<FilePath>"
+            self._conn.send("SaveAs", "/", f' * "{path}"')
         else:
-            self._conn.send("Save", self._path, "")
+            # Save / * — 保存当前场景
+            self._conn.send("Save", "/", " *")
         return self
 
     def load(self, path: str) -> "ScenarioBuilder":
@@ -108,7 +110,7 @@ class ScenarioBuilder:
         -------
         self
         """
-        self._conn.send("Load", "*", f' "{path}"')
+        self._conn.send("Load", "/", f' "{path}"')
         return self
 
     def unload(self) -> "ScenarioBuilder":

@@ -64,7 +64,16 @@ class TestScenarioBuilder:
         builder = ScenarioBuilder(conn, "TestSc")
         builder.save("C:/temp/test.xml")
 
-        assert ("Save", "*/Scenario/TestSc", ' "C:/temp/test.xml"') in conn.calls
+        assert ("SaveAs", "/", ' * "C:/temp/test.xml"') in conn.calls
+
+    def test_save_without_path(self) -> None:
+        from atk.connect.scenario import ScenarioBuilder
+
+        conn = MockATKConnection()
+        builder = ScenarioBuilder(conn, "TestSc")
+        builder.save()
+
+        assert ("Save", "/", " *") in conn.calls
 
     def test_repr(self) -> None:
         from atk.connect.scenario import ScenarioBuilder

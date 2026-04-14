@@ -67,6 +67,25 @@ class TestSatelliteBuilder:
         # 检查 Classical 格式包含 SMA
         assert " Classical " in setstate_calls[0][2]
         assert " 7100 " in setstate_calls[0][2] or " 7100" in setstate_calls[0][2]
+        # SetState 后必须重置动画
+        assert ("Animate", "*", " Reset") in conn.calls
+
+    def test_set_state_tle(self) -> None:
+        from atk.connect.satellite import SatelliteBuilder
+
+        conn = MockATKConnection()
+        sat = SatelliteBuilder(conn, "Sat1")
+        line1 = "1 00005U 58002B   21084.26048267 -.00000099  00000-0 -13258-3 0  9992"
+        line2 = "2 00005  34.2472  83.1377 1847466 176.0822 185.6710 10.84848342235752"
+        sat.set_state_tle(line1, line2)
+
+        setstate_calls = [c for c in conn.calls if c[0] == "SetState"]
+        assert len(setstate_calls) == 1
+        assert " TLE " in setstate_calls[0][2]
+        assert line1 in setstate_calls[0][2]
+        assert line2 in setstate_calls[0][2]
+        # TLE SetState 后必须重置动画
+        assert ("Animate", "*", " Reset") in conn.calls
 
     def test_set_mass(self) -> None:
         from atk.connect.satellite import SatelliteBuilder
