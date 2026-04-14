@@ -7,14 +7,11 @@ via Connect commands.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from atk import exceptions as _ex
 from atk import utils
 
-if TYPE_CHECKING:
-    from atk.connect.session import ATKConnection
-    from atk.connect.satellite import SatelliteBuilder
+from atk.connect.satellite import SatelliteBuilder
+from atk.connect.session import ATKConnection
 
 
 class ScenarioBuilder:
