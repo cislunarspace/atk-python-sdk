@@ -120,11 +120,9 @@ class ATKConnection:
                 "Connection is closed"
             )
 
-        # 规范化路径
-        obj_path = utils.resolve_path(obj_path)
-
         # ATK Connect 协议：atkConnect(conID, command, inputStr)
         # 其中 inputStr = "obj_path param"，两者必须合并为一个字符串
+        # 注意：不调用 resolve_path()，调用者应传入正确的 ATK 路径格式
         input_str = f"{obj_path} {param}".strip()
         result = _ATK.atkConnect(self.con_id, command, input_str)
 

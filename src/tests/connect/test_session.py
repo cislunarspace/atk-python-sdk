@@ -26,7 +26,7 @@ class TestATKConnectionSend:
             mock_atk.atkConnect.assert_called_once_with(123, "New", "*/Scenario/Sc1")
             assert result is mock_result
 
-    def test_send_normalises_path(self) -> None:
+    def test_send_passes_path_as_is(self) -> None:
         with patch("atk.connect.session._ATK") as mock_atk:
             mock_result = MagicMock()
             mock_result.m_vectData = "OK"
@@ -34,8 +34,9 @@ class TestATKConnectionSend:
 
             from atk.connect.session import ATKConnection
             conn = ATKConnection(con_id=1, host="127.0.0.1", port=6655)
-            conn.send("New", "Satellite/Sat1", "")
+            conn.send("New", "*/Satellite/Sat1", "")
 
+            # send() 不再修改路径，调用者负责传入正确格式
             mock_atk.atkConnect.assert_called_once_with(1, "New", "*/Satellite/Sat1")
 
     def test_send_raises_when_closed(self) -> None:
