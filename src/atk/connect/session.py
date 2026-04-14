@@ -126,7 +126,9 @@ class ATKConnection:
 
         # CMDRESULT may carry an error string in m_vectData
         data = utils.result_to_list(result)
-        if data and data[0].upper().rstrip(":").lstrip("-") in ("ERROR", "FAIL", "FALSE"):
+        # ATK returns NACK for command failures; also check ERROR/FAIL/FALSE
+        error_indicators = ("ERROR", "FAIL", "FALSE", "NACK")
+        if data and data[0].upper().rstrip(":").lstrip("-") in error_indicators:
             raise _ex.ATKCommandError(
                 command, obj_path, param,
                 raw_response=" ".join(data)

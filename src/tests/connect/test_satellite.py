@@ -29,7 +29,8 @@ class TestSatelliteBuilder:
         sat = SatelliteBuilder(conn, "Sat1")
         sat.create()
 
-        assert ("New", "*/Satellite/Sat1", "") in conn.calls
+        # ATK format: obj='*', param=' Satellite {name}'
+        assert ("New", "*", " Satellite Sat1") in conn.calls
 
     def test_set_propagator(self) -> None:
         from atk.connect.satellite import SatelliteBuilder
@@ -38,9 +39,9 @@ class TestSatelliteBuilder:
         sat = SatelliteBuilder(conn, "Sat1")
         sat.set_propagator("PropagatorAstromaster")
 
-        prop_calls = [c for c in conn.calls if c[0] == "SetPropagator"]
-        assert len(prop_calls) == 1
-        assert "Astromaster" in prop_calls[0][2]
+        # set_propagator() now stores the propagator; no send() calls made
+        assert len(conn.calls) == 0
+        assert sat.propagator == "Astromaster"
 
     def test_invalid_propagator_raises(self) -> None:
         from atk.connect.satellite import SatelliteBuilder
@@ -59,12 +60,12 @@ class TestSatelliteBuilder:
         sat = SatelliteBuilder(conn, "Sat1")
         sat.set_keplerian(sma=7100, ecc=0.001, inc=30, raan=0, argp=0, ta=180)
 
-        setvalue_calls = [c for c in conn.calls if c[0] == "SetValue"]
-        assert len(setvalue_calls) == 6  # sma, ecc, inc, raan, argp, ta
-
-        # Check SMA was set with correct value
-        sma_call = [c for c in setvalue_calls if "sma" in c[2]][0]
-        assert "7100" in sma_call[2]
+        # Uses SetState with Classical format
+        setstate_calls = [c for c in conn.calls if c[0] == "SetState"]
+        assert len(setstate_calls) == 1
+        # Check Classical format includes SMA
+        assert " Classical " in setstate_calls[0][2]
+        assert " 7100 " in setstate_calls[0][2] or " 7100" in setstate_calls[0][2]
 
     def test_set_mass(self) -> None:
         from atk.connect.satellite import SatelliteBuilder

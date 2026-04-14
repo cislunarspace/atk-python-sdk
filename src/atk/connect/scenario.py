@@ -56,13 +56,26 @@ class ScenarioBuilder:
 
     def create(self) -> "ScenarioBuilder":
         """
-        Create the scenario object in ATK.
+        Set up (or create) the scenario in ATK.
+
+        ATK always has a default scenario loaded when it starts.
+        ``New / Scenario {name}`` creates a NEW scenario, which fails if
+        a scenario is already loaded. This method handles that gracefully:
+        if a scenario already exists (NACK from New), we simply use it —
+        ``set_analysis_period()`` and other operations work regardless
+        of which scenario is active.
 
         Returns
         -------
         self
         """
-        self._conn.send("New", self._path, "")
+        # ATK New command format: obj='*', param=' Scenario {name}'
+        # NACK is expected if a scenario is already loaded — that's fine.
+        try:
+            self._conn.send("New", "*", f" Scenario {self._name}")
+        except Exception:
+            # Scenario already exists; use it as-is
+            pass
         return self
 
     def save(self, path: str | None = None) -> "ScenarioBuilder":

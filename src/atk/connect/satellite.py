@@ -83,8 +83,12 @@ class SatelliteBuilder:
     # ------------------------------------------------------------------
 
     def create(self) -> "SatelliteBuilder":
-        """Create the satellite object in ATK."""
-        self._conn.send("New", self._path, "")
+        """
+        Create the satellite object in ATK.
+
+        Uses ATK format: ``New / Satellite {name}`` with obj='*'.
+        """
+        self._conn.send("New", "*", f" Satellite {self._name}")
         return self
 
     # ------------------------------------------------------------------
@@ -95,24 +99,27 @@ class SatelliteBuilder:
         """
         Set the satellite's propagator type.
 
+        The propagator is stored and applied when
+        :meth:`set_keplerian` or :meth:`set_cartesian` is called,
+        since ATK uses ``SetState`` with the propagator embedded.
+
         Parameters
         ----------
         propagator : str
             Propagator name. Valid names:
             ``PropagatorTwoBody``, ``PropagatorJ2Perturbation``,
-            ``PropagatorHPOP``, ``PropagatorSGP4``, ``PropagatorStkExternal``,
-            ``PropagatorAstromaster``, ``PropagatorGreatArc``,
-            ``PropagatorSimpleAscent``, ``PropagatorJ4Perturbation``,
-            ``PropagatorVinti``, ``PropagatorBallistic``.
+            ``PropagatorHPOP``, ``PropagatorSGP4`` (via TLE),
+            ``PropagatorStkExternal``, ``PropagatorAstromaster``,
+            ``PropagatorGreatArc``, ``PropagatorSimpleAscent``,
+            ``PropagatorJ4Perturbation``, ``PropagatorVinti``,
+            ``PropagatorBallistic``.
         """
         if propagator not in _PROPAGATOR_CMD_MAP:
             raise _ex.ATKValueError(
                 f"Unknown propagator {propagator!r}. "
                 f"Valid names: {list(_PROPAGATOR_CMD_MAP)}"
             )
-        self._propagator = propagator
-        cmd_name = _PROPAGATOR_CMD_MAP[propagator]
-        self._conn.send("SetPropagator", self._path, f' "{cmd_name}"')
+        self._propagator = _PROPAGATOR_CMD_MAP[propagator]
         return self
 
     # ------------------------------------------------------------------
@@ -147,23 +154,24 @@ class SatelliteBuilder:
         ta : float
             True anomaly (degrees).
         epoch : str, optional
-            Epoch time string in ATK format.
+            Epoch time string in ATK format (e.g. ``"1 Jan 2024 00:00:00.000"``).
 
         Returns
         -------
         self
         """
-        # The Connect path for Keplerian state in Astromaster MCS:
-        # MainSequence.SegmentList.Initial_State.InitialState.Keplerian.sma
-        base = f"{self._path}/MainSequence.SegmentList.Initial_State.InitialState.Keplerian"
-        self._conn.send("SetValue", self._path, f' "{base}.sma" {sma}')
-        self._conn.send("SetValue", self._path, f' "{base}.ecc" {ecc}')
-        self._conn.send("SetValue", self._path, f' "{base}.inc" {inc}')
-        self._conn.send("SetValue", self._path, f' "{base}.raan" {raan}')
-        self._conn.send("SetValue", self._path, f' "{base}.argp" {argp}')
-        self._conn.send("SetValue", self._path, f' "{base}.ta" {ta}')
-        if epoch:
-            self._conn.send("SetValue", self._path, f' "{base}.epoch" "{epoch}"')
+        # ATK SetState with Classical propagator format:
+        # SetState */Satellite/{name} Classical {Propagator} "{start}" "{stop}"
+        #   {Step} {CoordSys} "{epoch}" {SMA} {ECC} {INC} {RAAN} {ARGP} {TA}
+        if epoch is None:
+            epoch = "1 Jan 2024 00:00:00.000"
+        prop = self._propagator or "TwoBody"
+        stop = epoch  # single-point analysis uses same epoch start/stop
+        param = (
+            f' Classical {prop} "{epoch}" "{stop}" '
+            f'60 J2000 "{epoch}" {sma} {ecc} {inc} {raan} {argp} {ta}'
+        )
+        self._conn.send("SetState", self._path, param)
         return self
 
     def set_cartesian(
@@ -194,15 +202,15 @@ class SatelliteBuilder:
         -------
         self
         """
-        base = f"{self._path}/MainSequence.SegmentList.Initial_State.InitialState"
-        self._conn.send("SetValue", self._path, f' "{base}.CartesianX" {x}')
-        self._conn.send("SetValue", self._path, f' "{base}.CartesianY" {y}')
-        self._conn.send("SetValue", self._path, f' "{base}.CartesianZ" {z}')
-        self._conn.send("SetValue", self._path, f' "{base}.CartesianVX" {vx}')
-        self._conn.send("SetValue", self._path, f' "{base}.CartesianVY" {vy}')
-        self._conn.send("SetValue", self._path, f' "{base}.CartesianVZ" {vz}')
-        if epoch:
-            self._conn.send("SetValue", self._path, f' "{base}.Epoch" "{epoch}"')
+        if epoch is None:
+            epoch = "1 Jan 2024 00:00:00.000"
+        prop = self._propagator or "TwoBody"
+        stop = epoch
+        param = (
+            f' Cartesian {prop} "{epoch}" "{stop}" '
+            f'60 J2000 "{epoch}" {x} {y} {z} {vx} {vy} {vz}'
+        )
+        self._conn.send("SetState", self._path, param)
         return self
 
     # ------------------------------------------------------------------

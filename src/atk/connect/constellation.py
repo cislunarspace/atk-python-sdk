@@ -140,12 +140,14 @@ class WalkerBuilder:
         if self._created:
             return self
 
-        # Create constellation container
-        self._conn.send("New", self._path_prefix, "")
+        # Create constellation container: New / Constellation/{name} with obj='*'
+        self._conn.send("New", "*", f" Constellation/{self._name}")
         self._created = True
 
         sats_per_plane = self._num_satellites // self._num_planes
         sats_in_plane = 0
+        epoch = "1 Jan 2024 00:00:00.000"
+        prop = self._propagator or "TwoBody"
 
         for sat_idx in range(self._num_satellites):
             plane_idx = sat_idx // sats_per_plane
@@ -160,19 +162,18 @@ class WalkerBuilder:
             ta = (360.0 / sats_per_plane) * intra_plane_idx + phase_offset
 
             sat_name = f"{self._name}_P{plane_idx}_S{intra_plane_idx}"
-            sat_path = f"{self._path_prefix}/Satellite/{sat_name}"
+            sat_path = f"*/Constellation/{self._name}/Satellite/{sat_name}"
 
-            self._conn.send("New", sat_path, "")
-            self._conn.send("SetPropagator", sat_path, f' "{self._propagator}"')
+            # Create satellite: New / Satellite {name} with obj='*'
+            self._conn.send("New", "*", f" Satellite {sat_name}")
 
-            # Set Keplerian elements
-            base = f"{sat_path}/MainSequence.SegmentList.Initial_State.InitialState.Keplerian"
-            self._conn.send("SetValue", sat_path, f' "{base}.sma" {self._sma}')
-            self._conn.send("SetValue", sat_path, f' "{base}.ecc" 0.0')
-            self._conn.send("SetValue", sat_path, f' "{base}.inc" {self._inc}')
-            self._conn.send("SetValue", sat_path, f' "{base}.raan" {raan}')
-            self._conn.send("SetValue", sat_path, f' "{base}.argp" 0.0')
-            self._conn.send("SetValue", sat_path, f' "{base}.ta" {ta}')
+            # Set Keplerian via SetState Classical {prop}
+            stop = epoch
+            param = (
+                f' Classical {prop} "{epoch}" "{stop}" '
+                f'60 J2000 "{epoch}" {self._sma} 0.0 {self._inc} {raan} 0.0 {ta}'
+            )
+            self._conn.send("SetState", sat_path, param)
 
             sats_in_plane += 1
             if sats_in_plane >= sats_per_plane:
