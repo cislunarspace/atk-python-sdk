@@ -1,0 +1,136 @@
+"""
+Unit tests for atk.connect.session — ATKConnection and connect().
+
+Uses unittest.mock to mock the SWIG bindings.
+"""
+
+import pytest
+from unittest.mock import MagicMock, patch
+
+from atk import exceptions as atk_exc
+
+
+class TestATKConnectionSend:
+    """Tests for ATKConnection.send()."""
+
+    def test_send_calls_atkConnect_correctly(self) -> None:
+        with patch("atk.connect.session._ATK") as mock_atk:
+            mock_result = MagicMock()
+            mock_result.m_vectData = "OK"
+            mock_atk.atkConnect.return_value = mock_result
+
+            from atk.connect.session import ATKConnection
+            conn = ATKConnection(con_id=123, host="127.0.0.1", port=6655)
+            result = conn.send("New", "*/Scenario/Sc1", "")
+
+            mock_atk.atkConnect.assert_called_once_with(123, "New", "*/Scenario/Sc1", "")
+            assert result is mock_result
+
+    def test_send_normalises_path(self) -> None:
+        with patch("atk.connect.session._ATK") as mock_atk:
+            mock_result = MagicMock()
+            mock_result.m_vectData = "OK"
+            mock_atk.atkConnect.return_value = mock_result
+
+            from atk.connect.session import ATKConnection
+            conn = ATKConnection(con_id=1, host="127.0.0.1", port=6655)
+            conn.send("New", "Satellite/Sat1", "")
+
+            mock_atk.atkConnect.assert_called_once_with(1, "New", "*/Satellite/Sat1", "")
+
+    def test_send_raises_when_closed(self) -> None:
+        from atk.connect.session import ATKConnection
+        from atk import exceptions as atk_exc
+
+        conn = ATKConnection(con_id=1, host="127.0.0.1", port=6655)
+        conn._connected = False
+
+        with pytest.raises(atk_exc.ATKConnectionError, match="Connection is closed"):
+            conn.send("New", "*", "")
+
+    def test_send_raises_on_error_response(self) -> None:
+        with patch("atk.connect.session._ATK") as mock_atk:
+            mock_result = MagicMock()
+            mock_result.m_vectData = "ERROR: Invalid command"
+            mock_atk.atkConnect.return_value = mock_result
+
+            from atk.connect.session import ATKConnection
+            conn = ATKConnection(con_id=1, host="127.0.0.1", port=6655)
+
+            with pytest.raises(atk_exc.ATKCommandError, match="New.*failed"):
+                conn.send("New", "*", "")
+
+
+class TestATKConnectionClose:
+    """Tests for ATKConnection.close()."""
+
+    def test_close_calls_atkClose(self) -> None:
+        with patch("atk.connect.session._ATK") as mock_atk:
+            from atk.connect.session import ATKConnection
+            conn = ATKConnection(con_id=42, host="127.0.0.1", port=6655)
+            conn.close()
+
+            mock_atk.atkClose.assert_called_once_with(42)
+            assert conn.is_connected is False
+
+    def test_close_idempotent(self) -> None:
+        with patch("atk.connect.session._ATK") as mock_atk:
+            from atk.connect.session import ATKConnection
+            conn = ATKConnection(con_id=42, host="127.0.0.1", port=6655)
+            conn._connected = False  # already closed
+
+            conn.close()  # should not call atkClose again
+            mock_atk.atkClose.assert_not_called()
+
+
+class TestConnectionContextManager:
+    """Tests for the connect() context manager factory."""
+
+    def test_context_manager_closes_on_success(self) -> None:
+        with patch("atk.connect.session._ATK") as mock_atk:
+            mock_atk.atkOpen.return_value = 99
+
+            from atk.connect.session import connect
+            with connect() as conn:
+                assert conn.con_id == 99
+                assert conn.is_connected is True
+
+            mock_atk.atkClose.assert_called_once_with(99)
+
+    def test_context_manager_closes_on_exception(self) -> None:
+        with patch("atk.connect.session._ATK") as mock_atk:
+            mock_atk.atkOpen.return_value = 99
+
+            from atk.connect.session import connect
+            with pytest.raises(RuntimeError):
+                with connect() as conn:
+                    raise RuntimeError("test error")
+
+            mock_atk.atkClose.assert_called_once_with(99)
+
+
+class TestATKConnectionManager:
+    """Tests for ATKConnectionManager."""
+
+    def test_retry_on_failure(self) -> None:
+        with patch("atk.connect.session._ATK") as mock_atk:
+            # Fail twice, succeed on third attempt
+            mock_atk.atkOpen.side_effect = [Exception("fail1"), Exception("fail2"), 55]
+
+            from atk.connect.session import ATKConnectionManager
+            mgr = ATKConnectionManager(retries=3, backoff=0.01)
+            conn = mgr.connect()
+
+            assert mock_atk.atkOpen.call_count == 3
+            assert conn.con_id == 55
+
+    def test_exhausted_retries_raises(self) -> None:
+        with patch("atk.connect.session._ATK") as mock_atk:
+            mock_atk.atkOpen.side_effect = Exception("always fails")
+
+            from atk.connect.session import ATKConnectionManager
+            from atk import exceptions as atk_exc
+
+            mgr = ATKConnectionManager(retries=2, backoff=0.01)
+            with pytest.raises(atk_exc.ATKConnectionError, match="Failed after 2 attempts"):
+                mgr.connect()

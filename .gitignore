@@ -1,0 +1,45 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyc
+*.egg-info/
+
+# OS native extensions (generated builds)
+*.pyd
+*.so
+
+# Exceptions: ATK-provided core files in vendored/ are tracked
+# (force-added with git add -f)
+
+# vendored/__pycache__/ — Python cache, never track
+vendored/__pycache__/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# Distribution / packaging
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.env
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
