@@ -15,13 +15,23 @@ from atk import exceptions as _ex
 from atk import utils
 
 # ---------------------------------------------------------------------------
-# Raw SWIG imports — from vendored/ directory (repo root)
+# Raw SWIG imports — from vendored/ (sibling of atk/ under src/)
 # ---------------------------------------------------------------------------
+import os
+import sys
+
+# vendored/ lives at src/vendored/ (sibling of atk/). Resolve it relative
+# to this file: src/atk/connect/session.py → up 3 levels → src/ → vendored/
+_vendored_dir = os.path.join(os.path.dirname(__file__), "..", "..", "vendored")
+_vendored_dir = os.path.normpath(_vendored_dir)
+if _vendored_dir not in sys.path:
+    sys.path.insert(0, _vendored_dir)
+
 try:
-    from vendored import ATKConnectModule as _ATK
+    import ATKConnectModule as _ATK
 except ImportError as _exc:  # pragma: no cover
     raise ImportError(
-        "ATKConnectModule not found in vendored/. "
+        "ATKConnectModule not found in src/vendored/. "
         "Ensure the SDK is installed with: pip install -e ."
     ) from _exc
 
