@@ -138,16 +138,23 @@ class ATKConnection:
             return result
 
         # CMDRESULT 路径 — 可能通过 m_vectData 携带错误字符串
-        data = utils.result_to_list(result)
-        if data:
-            upper = data[0].upper().rstrip(":").lstrip("-")
-            error_indicators = ("ERROR", "FAIL", "FALSE", "NACK")
-            if upper in error_indicators:
-                raise _ex.ATKCommandError(
-                    command, obj_path, param,
-                    raw_response=" ".join(data)
-                )
-
+        # 直接检查 m_vectData，避免 result_to_list 返回 [] 时漏检错误
+        if hasattr(result, "m_vectData"):
+            raw = result.m_vectData
+            if isinstance(raw, str):
+                data = raw.strip().split() if raw.strip() else []
+            elif raw:
+                data = raw if isinstance(raw, list) else [raw]
+            else:
+                data = []
+            if data:
+                upper = data[0].upper().rstrip(":").lstrip("-")
+                error_indicators = ("ERROR", "FAIL", "FALSE", "NACK")
+                if upper in error_indicators:
+                    raise _ex.ATKCommandError(
+                        command, obj_path, param,
+                        raw_response=" ".join(str(x) for x in data)
+                    )
         return result
 
     def send_str(
