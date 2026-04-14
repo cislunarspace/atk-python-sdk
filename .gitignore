@@ -4,15 +4,17 @@ __pycache__/
 *.pyc
 *.egg-info/
 
-# OS native extensions (generated builds)
+# OS native extensions (generated builds) — EXCEPT in src/vendored/ (ATK official files)
 *.pyd
 *.so
+!src/vendored/*.pyd
+!src/vendored/*.so
+!src/vendored/*.cpython-38-aarch64-linux-gnu.so
 
-# Exceptions: ATK-provided core files in vendored/ are tracked
-# (force-added with git add -f)
-
-# vendored/__pycache__/ — Python cache, never track
+# vendored/__pycache__/ and src/vendored/__pycache__/
+__pycache__/
 vendored/__pycache__/
+src/vendored/__pycache__/
 
 # Test artifacts
 .pytest_cache/
