@@ -1,9 +1,9 @@
 """
-ATK Connect Mode SDK
+ATK Connect 模式 SDK
 ====================
-Connect to a running ATK instance over TCP and send Connect commands.
+通过 TCP 连接到运行中的 ATK 实例并发送 Connect 命令。
 
-Usage::
+用法::
 
     from atk.connect import connect
 
@@ -15,9 +15,9 @@ Usage::
 from atk.connect.session import ATKConnection, ATKConnectionManager
 from atk.connect.session import connect
 
-# Import submodules to trigger their _patch_connection() calls, which add
-# factory methods (create_scenario, create_satellite, constellation_builder,
-# create_coverage, mcs_builder) to ATKConnection.
+# 导入子模块以触发其 _patch_connection() 调用，这些调用会将
+# 工厂方法（create_scenario、create_satellite、constellation_builder、
+# create_coverage、mcs_builder）添加到 ATKConnection。
 from atk.connect import scenario  # noqa: F401
 from atk.connect import satellite  # noqa: F401
 from atk.connect import mcs  # noqa: F401

@@ -1,11 +1,12 @@
 """
-ATK Connect Mode — Scenario Builder
+ATK Connect 模式 — 场景构建器
 
-Provides a fluent Python API for creating and configuring ATK scenarios
-via Connect commands.
+提供流式 Python API，通过 Connect 命令创建和配置 ATK 场景。
 """
 
 from __future__ import annotations
+
+from typing import Any
 
 from atk import exceptions as _ex
 from atk import utils
@@ -16,12 +17,12 @@ from atk.connect.session import ATKConnection
 
 class ScenarioBuilder:
     """
-    Fluent builder for ATK scenarios in Connect mode.
+    Connect 模式下 ATK 场景的流式构建器。
 
-    Created via :meth:`ATKConnection.create_scenario() <atk.connect.session.ATKConnection.create_scenario>`
-    or by calling ``ScenarioBuilder(atk_conn, "ScenarioName")`` directly.
+    通过 :meth:`ATKConnection.create_scenario() <atk.connect.session.ATKConnection.create_scenario>`
+    创建，或直接调用 ``ScenarioBuilder(atk_conn, "ScenarioName")``。
 
-    Example::
+    示例::
 
         scenario = atk.create_scenario('MyMission')
         scenario.set_analysis_period('1 Jan 2024 00:00:00', '7 Jan 2024 00:00:00')
@@ -32,11 +33,11 @@ class ScenarioBuilder:
     def __init__(self, conn: "ATKConnection", name: str):
         self._conn = conn
         self._name = utils.validate_name(name)
-        # ATK Connect path for the scenario
+        # ATK Connect 中场景的路径
         self._path = f"*/Scenario/{self._name}"
 
     # ------------------------------------------------------------------
-    # Properties
+    # 属性
     # ------------------------------------------------------------------
 
     @property
@@ -48,41 +49,40 @@ class ScenarioBuilder:
         return self._path
 
     # ------------------------------------------------------------------
-    # Scenario lifecycle
+    # 场景生命周期
     # ------------------------------------------------------------------
 
     def create(self) -> "ScenarioBuilder":
         """
-        Set up (or create) the scenario in ATK.
+        在 ATK 中设置（或创建）场景。
 
-        ATK always has a default scenario loaded when it starts.
-        ``New / Scenario {name}`` creates a NEW scenario, which fails if
-        a scenario is already loaded. This method handles that gracefully:
-        if a scenario already exists (NACK from New), we simply use it —
-        ``set_analysis_period()`` and other operations work regardless
-        of which scenario is active.
+        ATK 启动时总会有一个默认场景已加载。
+        ``New / Scenario {name}`` 会创建一个新场景，但如果已有场景
+        加载则会失败。此方法优雅地处理此情况：如果场景已存在
+        （New 返回 NACK），我们直接使用它 — ``set_analysis_period()``
+        等操作无论哪个场景处于活动状态都能正常工作。
 
         Returns
         -------
         self
         """
-        # ATK New command format: obj='*', param=' Scenario {name}'
-        # NACK is expected if a scenario is already loaded — that's fine.
+        # ATK New 命令格式：obj='*', param=' Scenario {name}'
+        # 如果场景已加载，NACK 是预期行为 — 无需处理。
         try:
             self._conn.send("New", "*", f" Scenario {self._name}")
-        except Exception:
-            # Scenario already exists; use it as-is
+        except _ex.ATKCommandError:
+            # 场景已存在；直接使用
             pass
         return self
 
     def save(self, path: str | None = None) -> "ScenarioBuilder":
         """
-        Save the scenario to a file.
+        将场景保存到文件。
 
         Parameters
         ----------
         path : str, optional
-            Save path. If None, uses the scenario's current path.
+            保存路径。如果为 None，使用场景当前路径。
 
         Returns
         -------
@@ -96,12 +96,12 @@ class ScenarioBuilder:
 
     def load(self, path: str) -> "ScenarioBuilder":
         """
-        Load a scenario from an XML file.
+        从 XML 文件加载场景。
 
         Parameters
         ----------
         path : str
-            Path to the scenario XML file.
+            场景 XML 文件路径。
 
         Returns
         -------
@@ -111,12 +111,12 @@ class ScenarioBuilder:
         return self
 
     def unload(self) -> "ScenarioBuilder":
-        """Unload the scenario from ATK memory."""
+        """从 ATK 内存中卸载场景。"""
         self._conn.send("Unload", self._path, "")
         return self
 
     # ------------------------------------------------------------------
-    # Time configuration
+    # 时间配置
     # ------------------------------------------------------------------
 
     def set_analysis_period(
@@ -125,20 +125,20 @@ class ScenarioBuilder:
         stop: str,
     ) -> "ScenarioBuilder":
         """
-        Set the analysis time period for the scenario.
+        设置场景的分析时间段。
 
         Parameters
         ----------
         start : str
-            Start time in ATK format (e.g. ``"5 Nov 2022 00:00:00.000"``).
+            ATK 格式的开始时间（如 ``"5 Nov 2022 00:00:00.000"``）。
         stop : str
-            Stop time in ATK format.
+            ATK 格式的结束时间。
 
         Returns
         -------
         self
         """
-        # Normalise path: use '*' for global (no specific scenario)
+        # 规范化路径：使用 '*' 表示全局（无特定场景）
         self._conn.send(
             "SetAnalysisTimePeriod",
             "*",
@@ -151,12 +151,12 @@ class ScenarioBuilder:
         mode: str = "Keplerian",
     ) -> "ScenarioBuilder":
         """
-        Set the scenario's analysis mode.
+        设置场景的分析模式。
 
         Parameters
         ----------
         mode : str
-            One of ``"Keplerian"``, ``"Spice"``, ``"Fixed"``.
+            ``"Keplerian"``、``"Spice"``、``"Fixed"`` 之一。
 
         Returns
         -------
@@ -169,17 +169,17 @@ class ScenarioBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # Animation control
+    # 动画控制
     # ------------------------------------------------------------------
 
     def animate(self, forward: bool = True) -> "ScenarioBuilder":
         """
-        Start scenario animation.
+        启动场景动画。
 
         Parameters
         ----------
         forward : bool
-            True for forward play (default), False for reverse.
+            True 为正向播放（默认），False 为反向播放。
 
         Returns
         -------
@@ -190,26 +190,26 @@ class ScenarioBuilder:
         return self
 
     def stop_animation(self) -> "ScenarioBuilder":
-        """Stop scenario animation."""
+        """停止场景动画。"""
         self._conn.send("Animate", self._path, ' "Stop"')
         return self
 
     # ------------------------------------------------------------------
-    # 2D/3D windows
+    # 2D/3D 窗口
     # ------------------------------------------------------------------
 
     def open_2d_window(self, name: str = "2D") -> "ScenarioBuilder":
-        """Open a 2D graphics window for this scenario."""
+        """为此场景打开 2D 图形窗口。"""
         self._conn.send("Window2D", self._path, f' "{name}"')
         return self
 
     def open_3d_window(self, name: str = "3D") -> "ScenarioBuilder":
-        """Open a 3D graphics window for this scenario."""
+        """为此场景打开 3D 图形窗口。"""
         self._conn.send("Window3D", self._path, f' "{name}"')
         return self
 
     # ------------------------------------------------------------------
-    # Report shortcuts
+    # 报告快捷方式
     # ------------------------------------------------------------------
 
     def quick_report(
@@ -217,24 +217,24 @@ class ScenarioBuilder:
         obj_path: str,
         style: str,
         time_period: str | None = None,
-    ) -> "ATKConnection":
+    ) -> Any:
         """
-        Generate a quick report for an object.
+        为对象生成快速报告。
 
         Parameters
         ----------
         obj_path : str
-            Object path within the scenario.
+            场景内的对象路径。
         style : str
-            Report style name.
+            报告样式名称。
         time_period : str, optional
-            Time period string (e.g. ``"*"`` for all time).
+            时间段字符串（如 ``"*"`` 表示全部时间）。
 
         Returns
         -------
         CMDRESULT
-            The raw ATK report result. See :mod:`atk.connect.reports` for
-            a higher-level wrapper.
+            原始 ATK 报告结果。参见 :mod:`atk.connect.reports` 获取
+            更高级的封装。
         """
         if time_period:
             return self._conn.send(
@@ -249,7 +249,7 @@ class ScenarioBuilder:
         )
 
     # ------------------------------------------------------------------
-    # String representation
+    # 字符串表示
     # ------------------------------------------------------------------
 
     def __repr__(self) -> str:
@@ -257,33 +257,33 @@ class ScenarioBuilder:
 
 
 # ---------------------------------------------------------------------------
-# ATKConnection extension — add builder factories
+# ATKConnection 扩展 — 添加构建器工厂
 # ---------------------------------------------------------------------------
 
 def _scenario_builder_factory(conn: "ATKConnection", name: str) -> ScenarioBuilder:
-    """Create and register a ScenarioBuilder for the connection."""
+    """创建并注册场景的 ScenarioBuilder。"""
     builder = ScenarioBuilder(conn, name)
     builder.create()
     return builder
 
 
 def _satellite_builder_factory(conn: "ATKConnection", name: str, **kwargs) -> "SatelliteBuilder":
-    """Create and register a SatelliteBuilder for the connection."""
+    """创建并注册卫星的 SatelliteBuilder。"""
     builder = SatelliteBuilder(conn, name, **kwargs)
     builder.create()
     return builder
 
 
-# Monkey-patch ATKConnection with builder methods (applied after import)
+# 猴子补丁 ATKConnection 以添加构建器方法（导入后应用）
 def _patch_connection():
     from atk.connect import session as _s
 
     def create_scenario(self, name: str) -> ScenarioBuilder:
-        """Create a new scenario and return a ScenarioBuilder."""
+        """创建新场景并返回 ScenarioBuilder。"""
         return _scenario_builder_factory(self, name)
 
     def create_satellite(self, name: str, **kwargs) -> "SatelliteBuilder":
-        """Create a new satellite and return a SatelliteBuilder."""
+        """创建新卫星并返回 SatelliteBuilder。"""
         return _satellite_builder_factory(self, name, **kwargs)
 
     _s.ATKConnection.create_scenario = create_scenario

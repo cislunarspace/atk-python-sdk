@@ -1,8 +1,7 @@
 """
-ATK Connect Mode — MCS (Mission Control Sequence) Builder
+ATK Connect 模式 — MCS（任务控制序列）构建器
 
-Provides a fluent API for building Astrogator MCS segment sequences
-via Connect commands.
+提供流式 API，通过 Connect 命令构建 Astrogator MCS 段序列。
 """
 
 from __future__ import annotations
@@ -16,15 +15,13 @@ if TYPE_CHECKING:
     from atk.connect.session import ATKConnection
 
 
-# Segment type names used in ATK Connect commands
 class McsBuilder:
     """
-    Fluent builder for Astrogator MCS (Mission Control Sequence) segments
-    in Connect mode.
+    Connect 模式下 Astrogator MCS（任务控制序列）段的流式构建器。
 
-    Created via ``atk.mcs_builder('*/Satellite/Sat1')``.
+    通过 ``atk.mcs_builder('*/Satellite/Sat1')`` 创建。
 
-    Example::
+    示例::
 
         mcs = atk.mcs_builder('*/Satellite/Sat1')
         mcs.initial_state_keplerian(sma=6678, ecc=0, inc=28.5, raan=0, argp=0, ta=0)
@@ -36,24 +33,24 @@ class McsBuilder:
     def __init__(self, conn: "ATKConnection", sat_path: str):
         self._conn = conn
         self._sat_path = utils.resolve_path(sat_path)
-        self._seg_index = 0  # tracks the next segment index
-        self._seg_paths: list[str] = []  # tracks each segment's full path
+        self._seg_index = 0  # 跟踪下一个段的索引
+        self._seg_paths: list[str] = []  # 跟踪每个段的完整路径
 
     # ------------------------------------------------------------------
-    # Internal helpers
+    # 内部辅助方法
     # ------------------------------------------------------------------
 
     def _next_seg_path(self, seg_type: str) -> str:
         """
-        Build and register the next segment's property path.
+        构建并注册下一段的属性路径。
 
-        Example path:
+        示例路径：
         ``MainSequence.SegmentList.Segment_0.Initial_State.InitialState.Keplerian``
         """
         idx = self._seg_index
         self._seg_index += 1
-        # Segment list format: Segment_<index>.<SegmentType>.<SegmentType>
-        # (relative to sat_path, no leading slash)
+        # 段列表格式：Segment_<index>.<SegmentType>.<SegmentType>
+        # （相对于 sat_path，无前导斜杠）
         base = (
             f"MainSequence.SegmentList"
             f".Segment_{idx}.{seg_type}"
@@ -62,15 +59,15 @@ class McsBuilder:
         return base
 
     def _set(self, seg_path: str, property_name: str, value: str) -> None:
-        """Send a SetValue command for a segment property."""
+        """发送段的属性的 SetValue 命令。"""
         self._conn.send("SetValue", self._sat_path, f' "{seg_path}.{property_name}" {value}')
 
     def _set_str(self, seg_path: str, property_name: str, value: str) -> None:
-        """Send a SetValue command with a string value (quoted)."""
+        """发送带引号字符串值的 SetValue 命令。"""
         self._conn.send("SetValue", self._sat_path, f' "{seg_path}.{property_name}" "{value}"')
 
     # ------------------------------------------------------------------
-    # Segment insertion — these create segments and configure them
+    # 段插入 — 创建段并配置
     # ------------------------------------------------------------------
 
     def initial_state_keplerian(
@@ -84,14 +81,14 @@ class McsBuilder:
         epoch: str | None = None,
     ) -> "McsBuilder":
         """
-        Add an InitialState segment with Keplerian elements.
+        添加一个带开普勒元素的 InitialState 段。
 
         Parameters
         ----------
         sma, ecc, inc, raan, argp, ta : float
-            Keplerian orbital elements (units as documented in ATK).
+            开普勒轨道元素（单位如 ATK 文档所述）。
         epoch : str, optional
-            Epoch time string.
+            历元时间字符串。
 
         Returns
         -------
@@ -116,7 +113,7 @@ class McsBuilder:
         epoch: str | None = None,
     ) -> "McsBuilder":
         """
-        Add an InitialState segment with Cartesian elements.
+        添加一个带笛卡尔坐标元素的 InitialState 段。
 
         Returns
         -------
@@ -140,14 +137,14 @@ class McsBuilder:
         prop_time_step: float = 60.0,
     ) -> "McsBuilder":
         """
-        Add a Propagate segment that runs until a stop time.
+        添加一个 Propagate 段，运行到指定的停止时间。
 
         Parameters
         ----------
         stop_time : str
-            Stop time string in ATK format (e.g. ``"10 Jan 2024 12:00:00.000"``).
+            ATK 格式的停止时间字符串（如 ``"10 Jan 2024 12:00:00.000"``）。
         prop_time_step : float
-            Propagation time step in seconds.
+            传播时间步长（秒）。
 
         Returns
         -------
@@ -166,14 +163,14 @@ class McsBuilder:
         time_step: float = 60.0,
     ) -> "McsBuilder":
         """
-        Add a Propagate segment that runs for a given duration.
+        添加一个 Propagate 段，运行指定的持续时间。
 
         Parameters
         ----------
         duration_seconds : float
-            Duration in seconds.
+            持续时间（秒）。
         time_step : float
-            Propagation time step in seconds.
+            传播时间步长（秒）。
 
         Returns
         -------
@@ -192,16 +189,15 @@ class McsBuilder:
         burn_direction: str = " CartesianX",
     ) -> "McsBuilder":
         """
-        Add an ImpulsiveBurn segment (finite DV but modelled as instantaneous).
+        添加一个 ImpulsiveBurn 段（有限 DV 但建模为瞬时的）。
 
         Parameters
         ----------
-        dv : tuple/list of 3 floats
-            Delta-V components in km/s.
+        dv : tuple/list，包含 3 个浮点数
+            Delta-V 分量（km/s）。
         burn_direction : str
-            Burn direction keyword. Default ``" CartesianX"`` applies DV along
-            the spacecraft X axis. Other options: ``" Velocity"``,
-            ``" Radius"``, ``" AntiVelocity"``, etc.
+            点火方向关键字。默认 ``" CartesianX"`` 沿航天器 X 轴施加 DV。
+            其他选项：``" Velocity"``、``" Radius"``、``" AntiVelocity"`` 等。
 
         Returns
         -------
@@ -224,14 +220,14 @@ class McsBuilder:
         tolerance: float = 1e-6,
     ) -> "McsBuilder":
         """
-        Add a TargetSequence segment pointing at another object's final state.
+        添加一个 TargetSequence 段，指向另一个对象的最终状态。
 
         Parameters
         ----------
         endpoint_path : str
-            ATK path of the target endpoint (e.g. ``"*/Scenario/Sat2"``).
+            目标端点的 ATK 路径（如 ``"*/Scenario/Sat2"``）。
         tolerance : float
-            Convergence tolerance for the differential corrector.
+            微分修正器的收敛容差。
 
         Returns
         -------
@@ -245,12 +241,12 @@ class McsBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # Run
+    # 运行
     # ------------------------------------------------------------------
 
     def run(self) -> "McsBuilder":
         """
-        Run the MCS for the satellite.
+        运行卫星的 MCS。
 
         Returns
         -------
@@ -261,7 +257,7 @@ class McsBuilder:
 
     def apply_changes(self) -> "McsBuilder":
         """
-        Apply all pending profile changes after a run.
+        运行后应用所有待处理的配置变更。
 
         Returns
         -------
@@ -272,7 +268,7 @@ class McsBuilder:
 
     def reset_profiles(self) -> "McsBuilder":
         """
-        Reset all MCS profiles to their initial state.
+        将所有 MCS 配置重置为初始状态。
 
         Returns
         -------
@@ -282,11 +278,11 @@ class McsBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # Query
+    # 查询
     # ------------------------------------------------------------------
 
     def get_segment_count(self) -> int:
-        """Return the number of segments added so far."""
+        """返回目前已添加的段数量。"""
         return self._seg_index
 
     def __repr__(self) -> str:
@@ -294,7 +290,7 @@ class McsBuilder:
 
 
 # ---------------------------------------------------------------------------
-# Helper to add mcs_builder() to ATKConnection
+# 将 mcs_builder() 添加到 ATKConnection 的辅助函数
 # ---------------------------------------------------------------------------
 
 def _mcs_builder_factory(conn: "ATKConnection", sat_path: str) -> McsBuilder:
@@ -305,7 +301,7 @@ def _patch_connection():
     from atk.connect import session as _s
 
     def mcs_builder(self, sat_path: str) -> McsBuilder:
-        """Create an McsBuilder for the given satellite path."""
+        """为指定卫星路径创建 McsBuilder。"""
         return _mcs_builder_factory(self, sat_path)
 
     _s.ATKConnection.mcs_builder = mcs_builder

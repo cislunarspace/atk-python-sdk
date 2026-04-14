@@ -1,5 +1,5 @@
 """
-Unit tests for atk.connect.mcs — McsBuilder.
+atk.connect.mcs 的单元测试 — McsBuilder。
 """
 
 import pytest
@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 
 
 class MockATKConnection:
-    """Minimal ATKConnection mock."""
+    """最小 ATKConnection 模拟。"""
 
     def __init__(self) -> None:
         self.calls: list[tuple[str, str, str]] = []
@@ -20,7 +20,7 @@ class MockATKConnection:
 
 
 class TestMcsBuilder:
-    """Tests for McsBuilder."""
+    """McsBuilder 的测试。"""
 
     def test_initial_state_keplerian(self) -> None:
         from atk.connect.mcs import McsBuilder
@@ -68,7 +68,7 @@ class TestMcsBuilder:
         mcs = McsBuilder(conn, "*/Satellite/Sat1")
 
         with pytest.raises(atk_exc.ATKValueError, match="3 components"):
-            mcs.impulsive_burn(dv=[0.5, 0.1])  # only 2 components
+            mcs.impulsive_burn(dv=[0.5, 0.1])  # 仅 2 个分量
 
     def test_run_calls_runmcs(self) -> None:
         from atk.connect.mcs import McsBuilder

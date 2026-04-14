@@ -1,8 +1,8 @@
 """
-ATK Connect Mode — Report Execution and Result Parsing
+ATK Connect 模式 — 报告执行与结果解析
 
-Provides wrappers for ATK report commands with parsed output
-(converted to dict / pandas DataFrame).
+提供 ATK 报告命令的封装，支持解析输出
+（转换为 dict / pandas DataFrame）。
 """
 
 from __future__ import annotations
@@ -19,16 +19,16 @@ if TYPE_CHECKING:
 
 class ReportResult:
     """
-    Parsed ATK report result.
+    解析后的 ATK 报告结果。
 
     Attributes
     ----------
     raw : CMDRESULT
-        The raw SWIG result object.
+        原始 SWIG 结果对象。
     data : list[str]
-        Parsed row strings from ``m_vectData``.
+        从 ``m_vectData`` 解析的行字符串。
     columns : list[str]
-        Column headers (if available from the report style).
+        列标题（如果报告样式可用）。
     """
 
     def __init__(
@@ -54,21 +54,20 @@ class ReportResult:
 
     def to_dict(self) -> list[dict[str, str]]:
         """
-        Convert the report to a list of row dictionaries.
+        将报告转换为行字典列表。
 
-        Uses column headers as keys if available; otherwise uses ``col_0``,
-        ``col_1``, ... as fallbacks.
+        如果有列标题则用作键；否则使用 ``col_0``、``col_1`` ... 作为回退。
         """
         cols = self.columns
         rows = self.data
         if not rows:
             return []
 
-        # Reports are typically space-delimited with columns repeating
-        # Try to group into rows of known width
+        # 报告通常以空格分隔，列会重复
+        # 尝试按已知宽度分组为行
         n_cols = len(cols) if cols else 0
         if n_cols == 0:
-            # Fallback: single column, each item is a row
+            # 回退：单列，每个项为一行
             return [{"value": v} for v in rows]
 
         result = []
@@ -77,29 +76,27 @@ class ReportResult:
             if len(chunk) == n_cols:
                 result.append(dict(zip(cols, chunk)))
             else:
-                # Partial row at end
+                # 末尾不完整的行
                 result.append(dict(zip([f"col_{j}" for j in range(len(chunk))], chunk)))
         return result
 
     def to_dataframe(self) -> "pd.DataFrame":
         """
-        Convert the report to a ``pandas.DataFrame``.
+        将报告转换为 ``pandas.DataFrame``。
 
-        Requires ``pandas`` to be installed.
+        需要安装 ``pandas``。
 
         Returns
         -------
         DataFrame
         """
         try:
-            import pandas as pd  # noqa: F401
+            import pandas as pd
         except ImportError:
             raise _ex.ATKReportError(
                 "pandas is required for to_dataframe(). "
                 "Install it with: pip install pandas"
             )
-
-        import pandas as pd
 
         dicts = self.to_dict()
         if not dicts:
@@ -113,18 +110,18 @@ class ReportResult:
 
 class QuickReport:
     """
-    Execute a QuickReport-style command and return a parsed result.
+    执行 QuickReport 样式的命令并返回解析结果。
 
-    Created via :meth:`ATKConnection.quick_report()
-    <atk.connect.session.ATKConnection.quick_report>`.
+    通过 :meth:`ATKConnection.quick_report()
+    <atk.connect.session.ATKConnection.quick_report>` 创建。
 
-    Example::
+    示例::
 
         result = atk.quick_report('*/Satellite/Sat1', 'Position', time_period='*')
         df = result.to_dataframe()
     """
 
-    # Known report styles and their column names
+    # 已知的报告样式及其列名
     _REPORT_COLUMNS = {
         "Position":         ["time", "x", "y", "z", "vx", "vy", "vz"],
         "Keplerian":        ["time", "sma", "ecc", "inc", "raan", "argp", "ta"],
@@ -149,7 +146,7 @@ class QuickReport:
 
     def run(self) -> ReportResult:
         """
-        Execute the report and return a parsed result.
+        执行报告并返回解析结果。
 
         Returns
         -------
@@ -168,9 +165,9 @@ class QuickReport:
 
 class ReportRM:
     """
-    Execute a Report_RM (Report with file output) command.
+    执行 Report_RM（带文件输出的报告）命令。
 
-    Example::
+    示例::
 
         result = atk.report_rm(
             '*/Satellite/Sat1',
@@ -196,13 +193,12 @@ class ReportRM:
         output_file: str | None = None,
     ) -> ReportResult:
         """
-        Execute the report.
+        执行报告。
 
         Parameters
         ----------
         output_file : str, optional
-            Output file path for the report. If None, result is returned
-            as data rows.
+            报告的输出文件路径。如果为 None，结果以数据行返回。
 
         Returns
         -------
@@ -218,7 +214,7 @@ class ReportRM:
 
 
 # ---------------------------------------------------------------------------
-# Add convenience methods to ATKConnection
+# 为 ATKConnection 添加便捷方法
 # ---------------------------------------------------------------------------
 
 def _patch_connection():
@@ -230,7 +226,7 @@ def _patch_connection():
         style: str,
         time_period: str = "*",
     ) -> ReportResult:
-        """Execute a quick report and return parsed results."""
+        """执行快速报告并返回解析结果。"""
         return QuickReport(self, obj_path, style, time_period).run()
 
     def report_rm(
@@ -239,7 +235,7 @@ def _patch_connection():
         style: str,
         time_period: str = "*",
     ) -> ReportResult:
-        """Execute a Report_RM command and return parsed results."""
+        """执行 Report_RM 命令并返回解析结果。"""
         return ReportRM(self, obj_path, style, time_period).run()
 
     _s.ATKConnection.quick_report = quick_report

@@ -1,5 +1,5 @@
 """
-Unit tests for atk.connect.satellite — SatelliteBuilder.
+atk.connect.satellite 的单元测试 — SatelliteBuilder。
 """
 
 import pytest
@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 
 
 class MockATKConnection:
-    """Minimal ATKConnection mock."""
+    """最小 ATKConnection 模拟。"""
 
     def __init__(self) -> None:
         self.calls: list[tuple[str, str, str]] = []
@@ -20,7 +20,7 @@ class MockATKConnection:
 
 
 class TestSatelliteBuilder:
-    """Tests for SatelliteBuilder."""
+    """SatelliteBuilder 的测试。"""
 
     def test_create_satellite(self) -> None:
         from atk.connect.satellite import SatelliteBuilder
@@ -29,7 +29,7 @@ class TestSatelliteBuilder:
         sat = SatelliteBuilder(conn, "Sat1")
         sat.create()
 
-        # ATK format: obj='*', param=' Satellite {name}'
+        # ATK 格式：obj='*', param=' Satellite {name}'
         assert ("New", "*", " Satellite Sat1") in conn.calls
 
     def test_set_propagator(self) -> None:
@@ -39,7 +39,7 @@ class TestSatelliteBuilder:
         sat = SatelliteBuilder(conn, "Sat1")
         sat.set_propagator("PropagatorAstromaster")
 
-        # set_propagator() now stores the propagator; no send() calls made
+        # set_propagator() 现在仅存储传播器；不调用 send()
         assert len(conn.calls) == 0
         assert sat.propagator == "Astromaster"
 
@@ -60,10 +60,10 @@ class TestSatelliteBuilder:
         sat = SatelliteBuilder(conn, "Sat1")
         sat.set_keplerian(sma=7100, ecc=0.001, inc=30, raan=0, argp=0, ta=180)
 
-        # Uses SetState with Classical format
+        # 使用 SetState Classical 格式
         setstate_calls = [c for c in conn.calls if c[0] == "SetState"]
         assert len(setstate_calls) == 1
-        # Check Classical format includes SMA
+        # 检查 Classical 格式包含 SMA
         assert " Classical " in setstate_calls[0][2]
         assert " 7100 " in setstate_calls[0][2] or " 7100" in setstate_calls[0][2]
 

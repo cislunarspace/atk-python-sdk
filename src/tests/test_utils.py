@@ -1,5 +1,5 @@
 """
-Unit tests for atk.utils — time parsing, path utilities, result parsing.
+atk.utils 的单元测试 — 时间解析、路径工具、结果解析。
 """
 
 import pytest
@@ -8,7 +8,7 @@ from atk import exceptions as atk_exc
 
 
 class TestParseAtkTime:
-    """Tests for parse_atk_time()."""
+    """parse_atk_time() 的测试。"""
 
     def test_full_datetime(self) -> None:
         dt = utils.parse_atk_time("5 Nov 2022 00:00:00.000")
@@ -50,7 +50,7 @@ class TestParseAtkTime:
 
 
 class TestFormatAtkTime:
-    """Tests for format_atk_time()."""
+    """format_atk_time() 的测试。"""
 
     def test_roundtrip(self) -> None:
         from datetime import datetime
@@ -61,7 +61,7 @@ class TestFormatAtkTime:
 
 
 class TestResolvePath:
-    """Tests for resolve_path()."""
+    """resolve_path() 的测试。"""
 
     def test_already_wildcard(self) -> None:
         assert utils.resolve_path("*/Satellite/Sat1") == "*/Satellite/Sat1"
@@ -77,7 +77,7 @@ class TestResolvePath:
 
 
 class TestPathHelpers:
-    """Tests for path_join, path_parent, path_name."""
+    """path_join、path_parent、path_name 的测试。"""
 
     def test_path_join(self) -> None:
         assert utils.path_join("*", "Satellite", "Sat1") == "*/Satellite/Sat1"
@@ -93,7 +93,7 @@ class TestPathHelpers:
 
 
 class TestValidateName:
-    """Tests for validate_name()."""
+    """validate_name() 的测试。"""
 
     def test_valid_name(self) -> None:
         assert utils.validate_name("Satellite1") == "Satellite1"
@@ -113,7 +113,7 @@ class TestValidateName:
 
 
 class TestResultParsing:
-    """Tests for CMDRESULT parsing helpers."""
+    """CMDRESULT 解析辅助函数的测试。"""
 
     def test_result_to_list_with_string(self) -> None:
         class MockResult:

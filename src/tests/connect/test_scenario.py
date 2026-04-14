@@ -1,5 +1,5 @@
 """
-Unit tests for atk.connect.scenario — ScenarioBuilder.
+atk.connect.scenario 的单元测试 — ScenarioBuilder。
 """
 
 import pytest
@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 
 class MockATKConnection:
-    """Minimal ATKConnection mock for ScenarioBuilder tests."""
+    """ScenarioBuilder 测试的最小 ATKConnection 模拟。"""
 
     def __init__(self) -> None:
         self.calls: list[tuple[str, str, str]] = []
@@ -25,7 +25,7 @@ class MockATKConnection:
 
 
 class TestScenarioBuilder:
-    """Tests for ScenarioBuilder."""
+    """ScenarioBuilder 的测试。"""
 
     def test_create_scenario(self) -> None:
         from atk.connect.scenario import ScenarioBuilder
@@ -34,7 +34,7 @@ class TestScenarioBuilder:
         builder = ScenarioBuilder(conn, "MyScenario")
         builder.create()
 
-        # ATK format: obj='*', param=' Scenario {name}'
+        # ATK 格式：obj='*', param=' Scenario {name}'
         assert ("New", "*", " Scenario MyScenario") in conn.calls
 
     def test_set_analysis_period(self) -> None:

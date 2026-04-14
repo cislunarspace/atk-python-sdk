@@ -1,18 +1,16 @@
 """
-ATK Connect Mode — Constellation Builder and Batch Operations
+ATK Connect 模式 — 星座构建器与批量操作
 
-Provides Walker constellation pattern generation and parallel
-batch operations for multi-satellite analysis.
+提供 Walker 星座模式生成和多卫星分析的批量操作。
 """
 
 from __future__ import annotations
 
-import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import TYPE_CHECKING
 
 from atk import exceptions as _ex
 from atk import utils
+from atk.connect.satellite import _PROPAGATOR_CMD_MAP
 
 if TYPE_CHECKING:
     from atk.connect.session import ATKConnection
@@ -20,12 +18,12 @@ if TYPE_CHECKING:
 
 class WalkerBuilder:
     """
-    Build a Walker constellation using the Walker Delta pattern.
+    使用 Walker Delta 模式构建星座。
 
-    Reference: Walker, J.G. (1971) "Satellite constellations".
-    Pattern notation: ``T/P/F`` where T=total sats, P=planes, F=phase.
+    参考文献：Walker, J.G. (1971) "Satellite constellations"。
+    模式表示法：``T/P/F``，其中 T=卫星总数，P=轨道面数，F=相位因子。
 
-    Example::
+    示例::
 
         walker = atk.constellation_builder('Starlink')
         walker.walker_delta(
@@ -54,13 +52,12 @@ class WalkerBuilder:
         self._inc = 0.0
         self._alt = 0.0
         self._phase_ratio = 0.0
-        self._propagator = "PropagatorSGP4"
+        self._propagator = "TwoBody"
         self._sma: float | None = None
-        self._sat_builders: list = []  # SatelliteBuilder instances
         self._created = False
 
     # ------------------------------------------------------------------
-    # Walker Delta configuration
+    # Walker Delta 配置
     # ------------------------------------------------------------------
 
     def walker_delta(
@@ -71,18 +68,18 @@ class WalkerBuilder:
         alt: float,
     ) -> "WalkerBuilder":
         """
-        Configure a Walker Delta constellation.
+        配置 Walker Delta 星座。
 
         Parameters
         ----------
         num_satellites : int
-            Total number of satellites (T).
+            卫星总数 (T)。
         num_planes : int
-            Number of orbital planes (P). Must divide T evenly.
+            轨道面数 (P)。必须能整除 T。
         inc : float
-            Inclination in degrees.
+            轨道倾角（度）。
         alt : float
-            Altitude in km.
+            轨道高度（km）。
 
         Returns
         -------
@@ -104,34 +101,38 @@ class WalkerBuilder:
         self._inc = inc
         self._alt = alt
 
-        # Phase ratio F = satellites_per_plane / (1 + satellites_per_plane)
+        # 相位比 F = 每面卫星数 / (1 + 每面卫星数)
         sats_per_plane = num_satellites // num_planes
         self._phase_ratio = sats_per_plane / (num_planes * (sats_per_plane - 1) + 1)
 
-        # Approximate SMA from altitude (circular orbit, Earth radius ~6371 km)
+        # 从高度近似计算 SMA（圆轨道，地球半径约 6371 km）
         self._sma = alt + 6371.0
 
         return self
 
     def set_propagator(self, propagator: str) -> "WalkerBuilder":
         """
-        Set the propagator type for all satellites in the constellation.
+        设置星座中所有卫星的传播器类型。
 
         Returns
         -------
         self
         """
-        self._propagator = propagator
+        if propagator not in _PROPAGATOR_CMD_MAP:
+            raise _ex.ATKValueError(
+                f"Unknown propagator {propagator!r}. "
+                f"Valid names: {list(_PROPAGATOR_CMD_MAP)}"
+            )
+        self._propagator = _PROPAGATOR_CMD_MAP[propagator]
         return self
 
     # ------------------------------------------------------------------
-    # Build
+    # 构建
     # ------------------------------------------------------------------
 
     def build(self) -> "WalkerBuilder":
         """
-        Generate the constellation — create the constellation container
-        and all satellite objects with their orbital elements.
+        生成星座 — 创建星座容器和所有卫星对象及其轨道元素。
 
         Returns
         -------
@@ -140,12 +141,11 @@ class WalkerBuilder:
         if self._created:
             return self
 
-        # Create constellation container: New / Constellation/{name} with obj='*'
+        # 创建星座容器：New / Constellation/{name}，obj='*'
         self._conn.send("New", "*", f" Constellation/{self._name}")
         self._created = True
 
         sats_per_plane = self._num_satellites // self._num_planes
-        sats_in_plane = 0
         epoch = "1 Jan 2024 00:00:00.000"
         prop = self._propagator or "TwoBody"
 
@@ -153,21 +153,21 @@ class WalkerBuilder:
             plane_idx = sat_idx // sats_per_plane
             intra_plane_idx = sat_idx % sats_per_plane
 
-            # RAAN spacing: 360 / num_planes per plane
+            # RAAN 间距：360 / 轨道面数，每个面
             raan = (360.0 / self._num_planes) * plane_idx
 
-            # Phase offset: (360 / num_satellites) * phase_ratio * intra_plane_idx
-            # applied per plane offset
+            # 相位偏移：(360 / 卫星总数) * 相位比 * 面内索引
+            # 应用于每个面的偏移
             phase_offset = (360.0 / self._num_satellites) * self._phase_ratio * plane_idx
             ta = (360.0 / sats_per_plane) * intra_plane_idx + phase_offset
 
             sat_name = f"{self._name}_P{plane_idx}_S{intra_plane_idx}"
             sat_path = f"*/Constellation/{self._name}/Satellite/{sat_name}"
 
-            # Create satellite: New / Satellite {name} with obj='*'
+            # 创建卫星：New / Satellite {name}，obj='*'
             self._conn.send("New", "*", f" Satellite {sat_name}")
 
-            # Set Keplerian via SetState Classical {prop}
+            # 通过 SetState Classical {prop} 设置开普勒元素
             stop = epoch
             param = (
                 f' Classical {prop} "{epoch}" "{stop}" '
@@ -175,30 +175,23 @@ class WalkerBuilder:
             )
             self._conn.send("SetState", sat_path, param)
 
-            sats_in_plane += 1
-            if sats_in_plane >= sats_per_plane:
-                sats_in_plane = 0
-
         return self
 
     # ------------------------------------------------------------------
-    # Batch MCS run
+    # 批量 MCS 运行
     # ------------------------------------------------------------------
 
-    def run_all(self, max_workers: int = 8) -> dict[str, bool]:
+    def run_all(self) -> dict[str, bool]:
         """
-        Run MCS for all satellites in the constellation using a thread pool.
+        串行运行星座中所有卫星的 MCS。
 
-        Parameters
-        ----------
-        max_workers : int
-            Maximum concurrent connections to ATK. Default 8.
-            Be careful not to overwhelm the ATK server.
+        注意：ATK Connect 模式的 TCP 连接不支持并发访问，
+        因此使用串行执行以确保线程安全。
 
         Returns
         -------
         dict[str, bool]
-            Mapping of satellite name → success (True) or failure (False).
+            卫星名称 → 成功 (True) 或失败 (False) 的映射。
         """
         if not self._created:
             raise _ex.ATKError(
@@ -207,28 +200,17 @@ class WalkerBuilder:
 
         sats_per_plane = self._num_satellites // self._num_planes
         results: dict[str, bool] = {}
-        lock = threading.Lock()
 
-        def run_sat(sat_idx: int) -> tuple[str, bool]:
+        for sat_idx in range(self._num_satellites):
             plane_idx = sat_idx // sats_per_plane
             intra_plane_idx = sat_idx % sats_per_plane
             sat_name = f"{self._name}_P{plane_idx}_S{intra_plane_idx}"
             sat_path = f"{self._path_prefix}/Satellite/{sat_name}"
             try:
                 self._conn.send("RunMCS", sat_path, "")
-                return (sat_name, True)
+                results[sat_name] = True
             except Exception:
-                return (sat_name, False)
-
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = {
-                executor.submit(run_sat, i): i
-                for i in range(self._num_satellites)
-            }
-            for future in as_completed(futures):
-                name, success = future.result()
-                with lock:
-                    results[name] = success
+                results[sat_name] = False
 
         return results
 
@@ -244,16 +226,15 @@ class WalkerBuilder:
         )
 
 
-# Fix typo: intra_builder_idx should be intra_plane_idx
 # ---------------------------------------------------------------------------
-# Add constellation_builder() to ATKConnection
+# 将 constellation_builder() 添加到 ATKConnection
 # ---------------------------------------------------------------------------
 
 def _patch_connection():
     from atk.connect import session as _s
 
     def constellation_builder(self, name: str) -> WalkerBuilder:
-        """Create a Walker constellation builder."""
+        """创建 Walker 星座构建器。"""
         return WalkerBuilder(self, name)
 
     _s.ATKConnection.constellation_builder = constellation_builder

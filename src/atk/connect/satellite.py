@@ -1,8 +1,7 @@
 """
-ATK Connect Mode — Satellite Builder
+ATK Connect 模式 — 卫星构建器
 
-Provides a fluent Python API for creating and configuring satellites
-via Connect commands.
+提供流式 Python API，通过 Connect 命令创建和配置卫星。
 """
 
 from __future__ import annotations
@@ -17,7 +16,7 @@ if TYPE_CHECKING:
 
 
 # ---------------------------------------------------------------------------
-# Propagator type map — Connect command strings → ATK propagator names
+# 传播器类型映射 — Connect 命令字符串 → ATK 传播器名称
 # ---------------------------------------------------------------------------
 _PROPAGATOR_CMD_MAP = {
     "PropagatorTwoBody":        "TwoBody",
@@ -36,11 +35,11 @@ _PROPAGATOR_CMD_MAP = {
 
 class SatelliteBuilder:
     """
-    Fluent builder for ATK satellites in Connect mode.
+    Connect 模式下 ATK 卫星的流式构建器。
 
-    Created via :meth:`ATKConnection.create_satellite() <atk.connect.session.ATKConnection.create_satellite>`.
+    通过 :meth:`ATKConnection.create_satellite() <atk.connect.session.ATKConnection.create_satellite>` 创建。
 
-    Example::
+    示例::
 
         sat = atk.create_satellite('Sat1')
         sat.set_propagator('PropagatorAstromaster')
@@ -58,12 +57,12 @@ class SatelliteBuilder:
         self._conn = conn
         self._name = utils.validate_name(name)
         self._scenario_path = scenario_path
-        # Full ATK path to this satellite
+        # 此卫星的完整 ATK 路径
         self._path = f"{utils.resolve_path(scenario_path)}/Satellite/{self._name}"
         self._propagator: str | None = None
 
     # ------------------------------------------------------------------
-    # Properties
+    # 属性
     # ------------------------------------------------------------------
 
     @property
@@ -79,40 +78,39 @@ class SatelliteBuilder:
         return self._propagator
 
     # ------------------------------------------------------------------
-    # Creation
+    # 创建
     # ------------------------------------------------------------------
 
     def create(self) -> "SatelliteBuilder":
         """
-        Create the satellite object in ATK.
+        在 ATK 中创建卫星对象。
 
-        Uses ATK format: ``New / Satellite {name}`` with obj='*'.
+        使用 ATK 格式：``New / Satellite {name}``，obj='*'。
         """
         self._conn.send("New", "*", f" Satellite {self._name}")
         return self
 
     # ------------------------------------------------------------------
-    # Propagator configuration
+    # 传播器配置
     # ------------------------------------------------------------------
 
     def set_propagator(self, propagator: str) -> "SatelliteBuilder":
         """
-        Set the satellite's propagator type.
+        设置卫星的传播器类型。
 
-        The propagator is stored and applied when
-        :meth:`set_keplerian` or :meth:`set_cartesian` is called,
-        since ATK uses ``SetState`` with the propagator embedded.
+        传播器在调用 :meth:`set_keplerian` 或 :meth:`set_cartesian` 时
+        存储并应用，因为 ATK 使用 ``SetState`` 时嵌入传播器。
 
         Parameters
         ----------
         propagator : str
-            Propagator name. Valid names:
-            ``PropagatorTwoBody``, ``PropagatorJ2Perturbation``,
-            ``PropagatorHPOP``, ``PropagatorSGP4`` (via TLE),
-            ``PropagatorStkExternal``, ``PropagatorAstromaster``,
-            ``PropagatorGreatArc``, ``PropagatorSimpleAscent``,
-            ``PropagatorJ4Perturbation``, ``PropagatorVinti``,
-            ``PropagatorBallistic``.
+            传播器名称。有效名称：
+            ``PropagatorTwoBody``、``PropagatorJ2Perturbation``、
+            ``PropagatorHPOP``、``PropagatorSGP4``（通过 TLE）、
+            ``PropagatorStkExternal``、``PropagatorAstromaster``、
+            ``PropagatorGreatArc``、``PropagatorSimpleAscent``、
+            ``PropagatorJ4Perturbation``、``PropagatorVinti``、
+            ``PropagatorBallistic``。
         """
         if propagator not in _PROPAGATOR_CMD_MAP:
             raise _ex.ATKValueError(
@@ -123,7 +121,7 @@ class SatelliteBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # Orbital state — Keplerian elements
+    # 轨道状态 — 开普勒元素
     # ------------------------------------------------------------------
 
     def set_keplerian(
@@ -137,36 +135,36 @@ class SatelliteBuilder:
         epoch: str | None = None,
     ) -> "SatelliteBuilder":
         """
-        Set the satellite's orbital state using Keplerian elements.
+        使用开普勒元素设置卫星的轨道状态。
 
         Parameters
         ----------
         sma : float
-            Semi-major axis (km). Positive for orbit, negative for hyperbolic.
+            半长轴（km）。正值为轨道，负值为双曲线。
         ecc : float
-            Eccentricity (0 ≤ ecc < 1 for elliptical).
+            离心率（0 ≤ ecc < 1 为椭圆）。
         inc : float
-            Inclination (degrees).
+            轨道倾角（度）。
         raan : float
-            Right ascension of ascending node (degrees).
+            升交点赤经（度）。
         argp : float
-            Argument of periapsis (degrees).
+            近地点幅角（度）。
         ta : float
-            True anomaly (degrees).
+            真近点角（度）。
         epoch : str, optional
-            Epoch time string in ATK format (e.g. ``"1 Jan 2024 00:00:00.000"``).
+            ATK 格式的历元时间字符串（如 ``"1 Jan 2024 00:00:00.000"``）。
 
         Returns
         -------
         self
         """
-        # ATK SetState with Classical propagator format:
+        # ATK SetState Classical 传播器格式：
         # SetState */Satellite/{name} Classical {Propagator} "{start}" "{stop}"
         #   {Step} {CoordSys} "{epoch}" {SMA} {ECC} {INC} {RAAN} {ARGP} {TA}
         if epoch is None:
             epoch = "1 Jan 2024 00:00:00.000"
         prop = self._propagator or "TwoBody"
-        stop = epoch  # single-point analysis uses same epoch start/stop
+        stop = epoch  # 单点分析使用相同的历元作为开始和结束
         param = (
             f' Classical {prop} "{epoch}" "{stop}" '
             f'60 J2000 "{epoch}" {sma} {ecc} {inc} {raan} {argp} {ta}'
@@ -185,18 +183,16 @@ class SatelliteBuilder:
         epoch: str | None = None,
     ) -> "SatelliteBuilder":
         """
-        Set the satellite's orbital state using Cartesian elements.
+        使用笛卡尔坐标元素设置卫星的轨道状态。
 
         Parameters
         ----------
         x, y, z : float
-            Position components (km) in the specified frame.
+            位置分量（km），在 J2000 坐标系中。
         vx, vy, vz : float
-            Velocity components (km/s) in the specified frame.
+            速度分量（km/s），在 J2000 坐标系中。
         epoch : str, optional
-            Epoch time string in ATK format.
-        frame : str
-            Coordinate frame name (e.g. ``"J2000"``, ``"ECF"``).
+            ATK 格式的历元时间字符串。
 
         Returns
         -------
@@ -214,12 +210,12 @@ class SatelliteBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # Mass properties
+    # 质量属性
     # ------------------------------------------------------------------
 
     def set_mass(self, total_mass: float) -> "SatelliteBuilder":
         """
-        Set the satellite's total mass (kg).
+        设置卫星的总质量（kg）。
 
         Returns
         -------
@@ -238,7 +234,7 @@ class SatelliteBuilder:
         wet_mass: float,
     ) -> "SatelliteBuilder":
         """
-        Set the satellite's dry and wet (propellant) mass for stage modeling.
+        设置卫星的干质量和湿质量（含推进剂），用于阶段建模。
 
         Returns
         -------
@@ -257,7 +253,7 @@ class SatelliteBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # Attitude
+    # 姿态
     # ------------------------------------------------------------------
 
     def set_attitude(
@@ -269,14 +265,14 @@ class SatelliteBuilder:
         q4: float = 1,
     ) -> "SatelliteBuilder":
         """
-        Set the satellite's attitude type and optional quaternion.
+        设置卫星的姿态类型和可选四元数。
 
         Parameters
         ----------
         attitude_type : str
-            One of ``"CBF"``, ``"J2000"``, ``"NV"``, ``"TLE"``.
+            ``"CBF"``、``"J2000"``、``"NV"``、``"TLE"`` 之一。
         q1-q4 : float
-            Quaternion components (qx, qy, qz, qs). Default is (0,0,0,1) = identity.
+            四元数分量 (qx, qy, qz, qs)。默认为 (0,0,0,1) = 单位四元数。
 
         Returns
         -------
@@ -291,17 +287,17 @@ class SatelliteBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # Graphics / visualisation
+    # 图形 / 可视化
     # ------------------------------------------------------------------
 
     def set_color(self, color_index: int) -> "SatelliteBuilder":
         """
-        Set the satellite's graphics color by ATK color index.
+        通过 ATK 颜色索引设置卫星的图形颜色。
 
         Parameters
         ----------
         color_index : int
-            ATK color table index (0 = default, 12 = red, etc.).
+            ATK 颜色表索引（0 = 默认，12 = 红色等）。
 
         Returns
         -------
@@ -311,12 +307,12 @@ class SatelliteBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # Run / propagate
+    # 运行 / 传播
     # ------------------------------------------------------------------
 
     def run_mcs(self) -> "SatelliteBuilder":
         """
-        Run the Mission Control Sequence (MCS) for this satellite.
+        运行此卫星的任务控制序列 (MCS)。
 
         Returns
         -------
@@ -326,7 +322,7 @@ class SatelliteBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # String representation
+    # 字符串表示
     # ------------------------------------------------------------------
 
     def __repr__(self) -> str:

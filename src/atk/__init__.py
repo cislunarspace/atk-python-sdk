@@ -1,17 +1,17 @@
 """
 ATK Python SDK
 ==============
-High-level Python wrappers for Analytical Toolkit (ATK).
+Analytical Toolkit (ATK) 的高级 Python 封装。
 
-Two operating modes:
+两种运行模式：
 
-- ``atk.connect`` — Connect mode: TCP connection to a running ATK instance.
-  Requires ATK software to be running.
+- ``atk.connect`` — Connect 模式：通过 TCP 连接到运行中的 ATK 实例。
+  需要 ATK 软件已启动。
 
-- ``atk.component`` — Component mode: direct DLL load, no ATK window needed.
-  Runs in ATK's embedded Python environment.
+- ``atk.component`` — Component 模式：直接加载 DLL，无需 ATK 窗口。
+  在 ATK 的嵌入式 Python 环境中运行。
 
-Example usage (Connect mode)::
+Connect 模式示例::
 
     from atk.connect import connect
 
@@ -21,7 +21,7 @@ Example usage (Connect mode)::
         sat.set_keplerian(sma=7100, ecc=0.001, inc=30)
         atk.run()
 
-Example usage (Component mode)::
+Component 模式示例::
 
     from atk.component import session
 

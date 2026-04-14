@@ -1,7 +1,7 @@
 """
-ATK Component Mode — Report Export
+ATK Component 模式 — 报告导出
 
-Wraps ``IAtkObjectRoot.OutputDataReport()`` with a Pythonic interface.
+用 Python 风格的接口封装 ``IAtkObjectRoot.OutputDataReport()``。
 """
 
 from __future__ import annotations
@@ -14,12 +14,12 @@ if TYPE_CHECKING:
 
 class ReportExporter:
     """
-    Export data reports from ATK Component mode.
+    从 ATK Component 模式导出数据报告。
 
-    Created via :meth:`ComponentSession.report()
-    <atk.component.session.ComponentSession.report>`.
+    通过 :meth:`ComponentSession.report()
+    <atk.component.session.ComponentSession.report>` 创建。
 
-    Example::
+    示例::
 
         with component_session() as session:
             session.new_scenario('MyScenario')
@@ -51,17 +51,17 @@ class ReportExporter:
 
     def to_file(self, output_path: str) -> str:
         """
-        Generate the report and save to a file.
+        生成报告并保存到文件。
 
         Parameters
         ----------
         output_path : str
-            Output file path.
+            输出文件路径。
 
         Returns
         -------
         str
-            The ATK output file path.
+            ATK 输出文件路径。
         """
         result = self._session.root.OutputDataReport(
             self._obj,
@@ -75,12 +75,12 @@ class ReportExporter:
 
     def to_data(self) -> str:
         """
-        Generate the report and return the default ATK output path.
+        生成报告并返回 ATK 默认输出路径。
 
         Returns
         -------
         str
-            The ATK-generated output file path.
+            ATK 生成的输出文件路径。
         """
         result = self._session.root.OutputDataReport(
             self._obj,

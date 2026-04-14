@@ -1,8 +1,8 @@
 """
-ATK Component Mode — MCS (Mission Control Sequence) Builder
+ATK Component 模式 — MCS（任务控制序列）构建器
 
-Provides a fluent API for building Astrogator MCS segment sequences
-using the SWIG-wrapped IVADriverMCS / IVAMCSSegmentCollection.
+提供流式 API，通过 SWIG 封装的 IVADriverMCS / IVAMCSSegmentCollection
+构建 Astrogator MCS 段序列。
 """
 
 from __future__ import annotations
@@ -14,16 +14,14 @@ if TYPE_CHECKING:
     from atk.component.satellite import SatelliteBuilder
 
 
-# Segment type names used in ATK Component API
 class McsBuilder:
     """
-    Fluent builder for Astrogator MCS segments in Component mode.
+    Component 模式下 Astrogator MCS 段的流式构建器。
 
-    Created via :meth:`SatelliteBuilder.get_mcs_driver()
-    <atk.component.satellite.SatelliteBuilder.get_mcs_driver>` to get
-    a driver, then call :meth:`driver.main_sequence()
-    <IVADriverMCS.main_sequence>` to get a builder, or instantiate this
-    class directly::
+    通过 :meth:`SatelliteBuilder.get_mcs_driver()
+    <atk.component.satellite.SatelliteBuilder.get_mcs_driver>` 获取驱动器，
+    然后调用 :meth:`driver.main_sequence()
+    <IVADriverMCS.main_sequence>` 获取构建器，或直接实例化此类::
 
         sat = scenario.create_satellite('Sat1')
         sat.set_propagator_type('PropagatorAstromaster')
@@ -35,26 +33,26 @@ class McsBuilder:
     Attributes
     ----------
     driver : IVADriverMCS
-        The MCS driver obtained from the satellite.
+        从卫星获取的 MCS 驱动器。
     """
 
     def __init__(self, sat_or_driver: Any):
         """
         Parameters
         ----------
-        sat_or_driver : ISatellite or IVADriverMCS
-            The satellite or its already-obtained propagator driver.
+        sat_or_driver : ISatellite 或 IVADriverMCS
+            卫星或已获取的传播器驱动器。
         """
-        # Accept either ISatellite or IVADriverMCS
+        # 接受 ISatellite 或 IVADriverMCS
         self._driver: Any = None
         self._seq: Any = None
         self._seg_count = 0
 
         if hasattr(sat_or_driver, "GetPropagator"):
-            # It's an ISatellite
+            # 是 ISatellite
             self._driver = sat_or_driver.GetPropagator()
         elif hasattr(sat_or_driver, "GetMainSequence"):
-            # It's already an IVADriverMCS
+            # 已经是 IVADriverMCS
             self._driver = sat_or_driver
         else:
             raise _ex.ATKMCSError(
@@ -65,7 +63,7 @@ class McsBuilder:
         self._seg_count = self._seq.GetCount() if self._seq else 0
 
     # ------------------------------------------------------------------
-    # Properties
+    # 属性
     # ------------------------------------------------------------------
 
     @property
@@ -74,11 +72,11 @@ class McsBuilder:
 
     @property
     def segment_count(self) -> int:
-        """Number of segments currently in the sequence."""
+        """当前序列中的段数量。"""
         return self._seg_count
 
     # ------------------------------------------------------------------
-    # Segment builders
+    # 段构建器
     # ------------------------------------------------------------------
 
     def initial_state_keplerian(
@@ -92,7 +90,7 @@ class McsBuilder:
         epoch: str | None = None,
     ) -> "McsBuilder":
         """
-        Add an InitialState segment with Keplerian elements.
+        添加一个带开普勒元素的 InitialState 段。
 
         Returns
         -------
@@ -117,7 +115,7 @@ class McsBuilder:
         epoch: str | None = None,
     ) -> "McsBuilder":
         """
-        Add an InitialState segment with Cartesian elements.
+        添加一个带笛卡尔坐标元素的 InitialState 段。
 
         Returns
         -------
@@ -141,14 +139,14 @@ class McsBuilder:
         time_step: float = 60.0,
     ) -> "McsBuilder":
         """
-        Add a Propagate segment.
+        添加一个 Propagate 段。
 
         Parameters
         ----------
         stop_time : str
-            Stop time in ATK format.
+            ATK 格式的停止时间。
         time_step : float
-            Propagation time step in seconds.
+            传播时间步长（秒）。
 
         Returns
         -------
@@ -166,7 +164,7 @@ class McsBuilder:
         time_step: float = 60.0,
     ) -> "McsBuilder":
         """
-        Add a Propagate segment for a given duration.
+        添加一个指定持续时间的 Propagate 段。
 
         Returns
         -------
@@ -184,14 +182,14 @@ class McsBuilder:
         direction: str = "CartesianX",
     ) -> "McsBuilder":
         """
-        Add an ImpulsiveBurn segment.
+        添加一个 ImpulsiveBurn 段。
 
         Parameters
         ----------
-        dv : tuple/list of 3 floats
-            Delta-V components.
+        dv : tuple/list，包含 3 个浮点数
+            Delta-V 分量。
         direction : str
-            Burn direction. Default ``"CartesianX"``.
+            点火方向。默认 ``"CartesianX"``。
 
         Returns
         -------
@@ -213,7 +211,7 @@ class McsBuilder:
         tolerance: float = 1e-6,
     ) -> "McsBuilder":
         """
-        Add a TargetSequence segment.
+        添加一个 TargetSequence 段。
 
         Returns
         -------
@@ -226,33 +224,33 @@ class McsBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # Run / apply
+    # 运行 / 应用
     # ------------------------------------------------------------------
 
     def run(self) -> "McsBuilder":
-        """Run the MCS."""
+        """运行 MCS。"""
         self._driver.RunMCS()
         return self
 
     def apply_changes(self) -> "McsBuilder":
-        """Apply all pending profile changes."""
+        """应用所有待处理的配置变更。"""
         self._driver.ApplyAllProfileChanges()
         return self
 
     def reset_profiles(self) -> "McsBuilder":
-        """Reset all profiles to their initial state."""
+        """将所有配置重置为初始状态。"""
         self._driver.ResetAllProfiles()
         return self
 
     # ------------------------------------------------------------------
-    # Internal helpers
+    # 内部辅助方法
     # ------------------------------------------------------------------
 
     def _append_segment(self, seg_type: str) -> Any:
         """
-        Append a new segment of the given type to the main sequence.
+        向主序列追加指定类型的新段。
 
-        Returns the newly created segment object.
+        返回新创建的段对象。
         """
         # IVAMCSSegmentCollection.AppendSegment(type_name)
         seg = self._seq.AppendSegment(seg_type)
@@ -264,19 +262,19 @@ class McsBuilder:
 
 
 # ---------------------------------------------------------------------------
-# Internal property setter helper
+# 内部属性设置辅助函数
 # ---------------------------------------------------------------------------
 
 def _set_prop(props: Any, name: str, value: float | str) -> None:
     """
-    Set a property on an MCS segment properties object.
+    在 MCS 段属性对象上设置属性。
 
-    Tries SetValue first, then SetXxx(name) setter pattern.
+    优先尝试 SetValue，然后尝试 SetXxx(name) 设置模式。
     """
     if hasattr(props, "SetValue"):
         props.SetValue(name, value)
     else:
-        # Try SetXxx pattern
+        # 尝试 SetXxx 模式
         setter = getattr(type(props), f"Set{name}", None)
         if setter:
             setter(props, value)

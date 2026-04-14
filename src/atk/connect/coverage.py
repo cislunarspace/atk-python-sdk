@@ -1,8 +1,8 @@
 """
-ATK Connect Mode — Coverage Analysis Helpers
+ATK Connect 模式 — 覆盖分析辅助工具
 
-Provides a fluent API for creating coverage definitions,
-adding assets/facilities, and computing access statistics.
+提供流式 API，用于创建覆盖定义、添加资产/地面站，
+以及计算访问统计。
 """
 
 from __future__ import annotations
@@ -17,11 +17,11 @@ if TYPE_CHECKING:
 
 class CoverageBuilder:
     """
-    Fluent builder for ATK Coverage Definition objects.
+    ATK CoverageDefinition 对象的流式构建器。
 
-    Created via ``atk.create_coverage('CoverageName')``.
+    通过 ``atk.create_coverage('CoverageName')`` 创建。
 
-    Example::
+    示例::
 
         cov = atk.create_coverage('GroundCoverage')
         cov.add_asset('*/Satellite/Sat1')
@@ -46,18 +46,18 @@ class CoverageBuilder:
         return self._path
 
     def create(self) -> "CoverageBuilder":
-        """Create the coverage definition object in ATK."""
+        """在 ATK 中创建覆盖定义对象。"""
         self._conn.send("New", self._path, "")
         return self
 
     def add_asset(self, sat_path: str) -> "CoverageBuilder":
         """
-        Add a satellite as a coverage asset.
+        添加卫星作为覆盖资产。
 
         Parameters
         ----------
         sat_path : str
-            Satellite ATK path (e.g. ``"*/Satellite/Sat1"``).
+            卫星的 ATK 路径（如 ``"*/Satellite/Sat1"``）。
 
         Returns
         -------
@@ -65,17 +65,18 @@ class CoverageBuilder:
         """
         sat_path = utils.resolve_path(sat_path)
         self._assets.append(sat_path)
-        self._conn.send("Cov_AddAsset", self._path, f' "{sat_path}"')
+        # ATK format: Cov */CoverageDefinition/{name} Asset {sat_path} Assign
+        self._conn.send("Cov", self._path, f" Asset {sat_path} Assign")
         return self
 
     def add_facility(self, facility_path: str) -> "CoverageBuilder":
         """
-        Add a ground facility as a coverage target.
+        添加地面站作为覆盖目标。
 
         Parameters
         ----------
         facility_path : str
-            Facility ATK path (e.g. ``"*/Facility/Station1"``).
+            地面站的 ATK 路径（如 ``"*/Facility/Station1"``）。
 
         Returns
         -------
@@ -83,7 +84,8 @@ class CoverageBuilder:
         """
         facility_path = utils.resolve_path(facility_path)
         self._facilities.append(facility_path)
-        self._conn.send("Cov_AddFacility", self._path, f' "{facility_path}"')
+        # ATK format: Cov */CoverageDefinition/{name} Facility {facility_path} Assign
+        self._conn.send("Cov", self._path, f" Facility {facility_path} Assign")
         return self
 
     def set_grid_resolution(
@@ -93,25 +95,25 @@ class CoverageBuilder:
         grid_type: str = "LatLon",
     ) -> "CoverageBuilder":
         """
-        Set the coverage grid resolution.
+        设置覆盖网格分辨率。
 
         Parameters
         ----------
         lat_step : float
-            Latitude step in degrees.
+            纬度步长（度）。
         lon_step : float
-            Longitude step in degrees.
+            经度步长（度）。
         grid_type : str
-            Grid type (e.g. ``"LatLon"``, ``"Custom"``).
+            网格类型（如 ``"LatLon"``、``"Custom"``）。
 
         Returns
         -------
         self
         """
         self._conn.send(
-            "Cov_SetGrid",
+            "Cov",
             self._path,
-            f' "{grid_type}" {lat_step} {lon_step}',
+            f' Grid "{grid_type}" {lat_step} {lon_step}',
         )
         return self
 
@@ -121,14 +123,14 @@ class CoverageBuilder:
         asset_path: str | None = None,
     ) -> "CoverageBuilder":
         """
-        Attach a Figure of Merit (FOM) to the coverage definition.
+        将品质因数 (FOM) 附加到覆盖定义。
 
         Parameters
         ----------
         fom_name : str
-            FOM name (e.g. ``"SimpleAER"``, ``"Distance"``).
+            FOM 名称（如 ``"SimpleAER"``、``"Distance"``）。
         asset_path : str, optional
-            Asset path for the FOM.
+            FOM 的资产路径。
 
         Returns
         -------
@@ -136,12 +138,12 @@ class CoverageBuilder:
         """
         if asset_path:
             self._conn.send(
-                "Cov_SetFOM",
+                "Cov",
                 self._path,
-                f' "{fom_name}" "{utils.resolve_path(asset_path)}"',
+                f' FOM "{fom_name}" "{utils.resolve_path(asset_path)}"',
             )
         else:
-            self._conn.send("Cov_SetFOM", self._path, f' "{fom_name}"')
+            self._conn.send("Cov", self._path, f' FOM "{fom_name}"')
         return self
 
     def compute_stats(
@@ -149,19 +151,19 @@ class CoverageBuilder:
         time_period: str = "*",
     ) -> CoverageStats:
         """
-        Compute coverage statistics.
+        计算覆盖统计。
 
         Parameters
         ----------
         time_period : str
-            Time period string (e.g. ``"*"`` for all time).
+            时间段字符串（如 ``"*"`` 表示全部时间）。
 
         Returns
         -------
         CoverageStats
-            Object containing access count, total access time, etc.
+            包含访问次数、总访问时间等的对象。
         """
-        raw = self._conn.send("Cov_Compute", self._path, f" {time_period}")
+        raw = self._conn.send("Cov", self._path, f" Compute {time_period}")
         return CoverageStats(raw)
 
     def __repr__(self) -> str:
@@ -170,18 +172,18 @@ class CoverageBuilder:
 
 class CoverageStats:
     """
-    Parsed coverage computation result.
+    解析后的覆盖计算结果。
 
     Attributes
     ----------
     raw : CMDRESULT
-        Raw ATK result object.
+        原始 ATK 结果对象。
     access_count : int
-        Number of access intervals.
+        访问区间数量。
     total_access_time : float
-        Total access time in seconds.
+        总访问时间（秒）。
     mean_access_duration : float
-        Mean duration of each access interval.
+        每次访问区间的平均持续时间。
     """
 
     def __init__(self, raw):
@@ -190,19 +192,25 @@ class CoverageStats:
         self._parsed = self._parse()
 
     def _parse(self) -> dict:
-        """Parse the raw CMDRESULT data into a dict."""
+        """将原始 CMDRESULT 数据解析为字典。"""
         data = self._data
         if not data:
             return {}
-        # Coverage stats are typically returned as key=value pairs
+        # 优先尝试 key=value 格式
         result = {}
+        positional = []
         for item in data:
             if "=" in item:
                 key, val = item.split("=", 1)
                 result[key.strip()] = val.strip()
             else:
-                # Try positional: [count, total_time, mean_dur, ...]
-                pass
+                positional.append(item)
+        # 如果没有 key=value 对，尝试位置解析
+        if not result and len(positional) >= 3:
+            # [count, total_time, mean_dur, ...]
+            result["AccessCount"] = positional[0]
+            result["TotalAccessTime"] = positional[1]
+            result["MeanAccessDuration"] = positional[2] if len(positional) > 2 else "0"
         return result
 
     @property
@@ -225,14 +233,14 @@ class CoverageStats:
 
 
 # ---------------------------------------------------------------------------
-# Add create_coverage() to ATKConnection
+# 将 create_coverage() 添加到 ATKConnection
 # ---------------------------------------------------------------------------
 
 def _patch_connection():
     from atk.connect import session as _s
 
     def create_coverage(self, name: str) -> CoverageBuilder:
-        """Create a new CoverageDefinition and return a CoverageBuilder."""
+        """创建新的 CoverageDefinition 并返回 CoverageBuilder。"""
         builder = CoverageBuilder(self, name)
         builder.create()
         return builder

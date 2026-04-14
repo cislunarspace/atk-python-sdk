@@ -1,7 +1,7 @@
 """
-ATK Connect Mode — Session Management
+ATK Connect 模式 — 会话管理
 
-Provides ``ATKConnection`` (raw connection) and ``connect()`` (context manager).
+提供 ``ATKConnection``（原始连接）和 ``connect()``（上下文管理器）。
 """
 
 from __future__ import annotations
@@ -15,13 +15,13 @@ from atk import exceptions as _ex
 from atk import utils
 
 # ---------------------------------------------------------------------------
-# Raw SWIG imports — from vendored/ (sibling of atk/ under src/)
+# 原始 SWIG 导入 — 来自 vendored/（atk/ 的同级目录，位于 src/ 下）
 # ---------------------------------------------------------------------------
 import os
 import sys
 
-# vendored/ lives at src/vendored/ (sibling of atk/). Resolve it relative
-# to this file: src/atk/connect/session.py → up 3 levels → src/ → vendored/
+# vendored/ 位于 src/vendored/（atk/ 的同级目录）。相对于此文件解析：
+# src/atk/connect/session.py → 向上 3 级 → src/ → vendored/
 _vendored_dir = os.path.join(os.path.dirname(__file__), "..", "..", "vendored")
 _vendored_dir = os.path.normpath(_vendored_dir)
 if _vendored_dir not in sys.path:
@@ -37,33 +37,33 @@ except ImportError as _exc:  # pragma: no cover
 
 
 # ---------------------------------------------------------------------------
-# Constants
+# 常量
 # ---------------------------------------------------------------------------
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 6655
-CONNECT_TIMEOUT = 30.0  # seconds
+CONNECT_TIMEOUT = 30.0  # 秒
 RETRY_ATTEMPTS = 3
-RETRY_BACKOFF = 2.0  # seconds
+RETRY_BACKOFF = 2.0  # 秒
 
 
 # ---------------------------------------------------------------------------
-# ATKConnection — connection handle wrapper
+# ATKConnection — 连接句柄封装
 # ---------------------------------------------------------------------------
 
 class ATKConnection:
     """
-    Thin wrapper around an ATK Connect-mode TCP connection.
+    ATK Connect 模式 TCP 连接的轻量封装。
 
     Attributes
     ----------
     con_id : int
-        The connection handle returned by ``atkOpen``.
+        ``atkOpen`` 返回的连接句柄。
     host : str
-        Remote host address.
+        远程主机地址。
     port : int
-        TCP port number.
+        TCP 端口号。
     is_connected : bool
-        True while the connection is open.
+        连接开启时为 True。
     """
 
     __slots__ = ("con_id", "host", "port", "_connected")
@@ -79,7 +79,7 @@ class ATKConnection:
         return self._connected
 
     # ------------------------------------------------------------------
-    # Core ATK operations
+    # 核心 ATK 操作
     # ------------------------------------------------------------------
 
     def send(
@@ -87,31 +87,32 @@ class ATKConnection:
         command: str,
         obj_path: str = "*",
         param: str = "",
-    ) -> _ATK.CMDRESULT:
+    ) -> Any:
         """
-        Send a Connect command to ATK and return the raw result.
+        向 ATK 发送 Connect 命令并返回原始结果。
 
         Parameters
         ----------
         command : str
-            Connect command name (e.g. ``"New"``, ``"SetValue"``).
+            Connect 命令名称（如 ``"New"``、``"SetValue"``）。
         obj_path : str
-            Object path (e.g. ``"*/Satellite/Sat1"``). Use ``"*"`` or ``""`` for
-            commands that don't target a specific object.
+            对象路径（如 ``"*/Satellite/Sat1"``）。对于不针对
+            特定对象的命令，使用 ``"*"`` 或 ``""``。
         param : str
-            Parameter string for the command.
+            命令的参数字符串。
 
         Returns
         -------
-        CMDRESULT
-            SWIG wrapper containing ``m_vectData`` (list of strings) and ``Item()``.
+        str or CMDRESULT
+            SWIG DLL 可能返回 ``str``（如 ``"ACK"``/``"NACK"``）
+            或 ``CMDRESULT`` 对象。
 
         Raises
         ------
         ATKConnectionError
-            If the connection has been closed.
+            如果连接已关闭。
         ATKCommandError
-            If ATK returns an error string.
+            如果 ATK 返回错误字符串。
         """
         if not self._connected:
             raise _ex.ATKConnectionError(
@@ -119,20 +120,33 @@ class ATKConnection:
                 "Connection is closed"
             )
 
-        # Normalise path
+        # 规范化路径
         obj_path = utils.resolve_path(obj_path)
 
         result = _ATK.atkConnect(self.con_id, command, obj_path, param)
 
-        # CMDRESULT may carry an error string in m_vectData
+        # atkConnect() 可能返回 str（如 "NACK"、"ACK"）或 CMDRESULT — 两种都要处理
+        if isinstance(result, str):
+            raw = result.strip()
+            if raw:
+                upper = raw.upper().rstrip(":").lstrip("-")
+                error_indicators = ("ERROR", "FAIL", "FALSE", "NACK")
+                if upper in error_indicators:
+                    raise _ex.ATKCommandError(
+                        command, obj_path, param, raw_response=raw
+                    )
+            return result
+
+        # CMDRESULT 路径 — 可能通过 m_vectData 携带错误字符串
         data = utils.result_to_list(result)
-        # ATK returns NACK for command failures; also check ERROR/FAIL/FALSE
-        error_indicators = ("ERROR", "FAIL", "FALSE", "NACK")
-        if data and data[0].upper().rstrip(":").lstrip("-") in error_indicators:
-            raise _ex.ATKCommandError(
-                command, obj_path, param,
-                raw_response=" ".join(data)
-            )
+        if data:
+            upper = data[0].upper().rstrip(":").lstrip("-")
+            error_indicators = ("ERROR", "FAIL", "FALSE", "NACK")
+            if upper in error_indicators:
+                raise _ex.ATKCommandError(
+                    command, obj_path, param,
+                    raw_response=" ".join(data)
+                )
 
         return result
 
@@ -143,17 +157,18 @@ class ATKConnection:
         param: str = "",
     ) -> str:
         """
-        Like ``send()`` but return the response as a plain string.
+        类似 ``send()``，但将响应作为普通字符串返回。
 
-        This is a convenience for commands that return a single string
-        value (e.g. object names, status messages).
+        适用于返回单个字符串值的命令（如对象名称、状态消息）。
         """
         result = self.send(command, obj_path, param)
+        if isinstance(result, str):
+            return result.strip()
         data = utils.result_to_list(result)
         return " ".join(data)
 
     def close(self) -> None:
-        """Close the TCP connection to ATK."""
+        """关闭到 ATK 的 TCP 连接。"""
         if self._connected:
             try:
                 _ATK.atkClose(self.con_id)
@@ -166,27 +181,27 @@ class ATKConnection:
 
 
 # ---------------------------------------------------------------------------
-# Connection manager with retry
+# 带重试的连接管理器
 # ---------------------------------------------------------------------------
 
 class ATKConnectionManager:
     """
-    Manage ATK connection lifecycle with automatic retry on failure.
+    管理 ATK 连接生命周期，失败时自动重试。
 
     Parameters
     ----------
     host : str
-        ATK server host. Defaults to ``"127.0.0.1"``.
+        ATK 服务器主机。默认为 ``"127.0.0.1"``。
     port : int
-        ATK server port. Defaults to ``6655``.
+        ATK 服务器端口。默认为 ``6655``。
     timeout : float
-        Connection timeout in seconds. Defaults to ``30``.
+        连接超时（秒）。默认为 ``30``。
     retries : int
-        Number of retry attempts on connection failure. Defaults to ``3``.
+        连接失败时的重试次数。默认为 ``3``。
     backoff : float
-        Seconds to wait between retries. Defaults to ``2.0``.
+        重试之间的等待时间（秒）。默认为 ``2.0``。
 
-    Example::
+    示例::
 
         mgr = ATKConnectionManager('127.0.0.1', 6655, retries=5)
         conn = mgr.connect()
@@ -210,12 +225,12 @@ class ATKConnectionManager:
 
     def connect(self) -> ATKConnection:
         """
-        Open a connection to the ATK server.
+        打开到 ATK 服务器的连接。
 
         Raises
         ------
         ATKConnectionError
-            After all retry attempts are exhausted.
+            所有重试尝试耗尽后抛出。
         """
         last_ex: Exception | None = None
 
@@ -243,7 +258,7 @@ class ATKConnectionManager:
 
 
 # ---------------------------------------------------------------------------
-# Context-manager factory
+# 上下文管理器工厂
 # ---------------------------------------------------------------------------
 
 @contextmanager
@@ -255,14 +270,14 @@ def connect(
     backoff: float = RETRY_BACKOFF,
 ) -> Generator[ATKConnection, None, None]:
     """
-    Context-manager factory for ATK Connect mode.
+    ATK Connect 模式的上下文管理器工厂。
 
-    Usage::
+    用法::
 
         with connect() as atk:
             atk.send('New', '', '/ Scenario MyScenario')
 
-        # or, with custom host/port:
+        # 或指定自定义主机/端口：
         with connect('192.168.1.10', 6655) as atk:
             ...
 
@@ -276,9 +291,4 @@ def connect(
         yield conn
     finally:
         conn.close()
-
-
-# ---------------------------------------------------------------------------
-# Submodule lazy-import helpers — added in later phases
-# ---------------------------------------------------------------------------
 

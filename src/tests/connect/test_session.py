@@ -1,7 +1,7 @@
 """
-Unit tests for atk.connect.session — ATKConnection and connect().
+atk.connect.session 的单元测试 — ATKConnection 和 connect()。
 
-Uses unittest.mock to mock the SWIG bindings.
+使用 unittest.mock 模拟 SWIG 绑定。
 """
 
 import pytest
@@ -11,7 +11,7 @@ from atk import exceptions as atk_exc
 
 
 class TestATKConnectionSend:
-    """Tests for ATKConnection.send()."""
+    """ATKConnection.send() 的测试。"""
 
     def test_send_calls_atkConnect_correctly(self) -> None:
         with patch("atk.connect.session._ATK") as mock_atk:
@@ -62,7 +62,7 @@ class TestATKConnectionSend:
 
 
 class TestATKConnectionClose:
-    """Tests for ATKConnection.close()."""
+    """ATKConnection.close() 的测试。"""
 
     def test_close_calls_atkClose(self) -> None:
         with patch("atk.connect.session._ATK") as mock_atk:
@@ -77,14 +77,14 @@ class TestATKConnectionClose:
         with patch("atk.connect.session._ATK") as mock_atk:
             from atk.connect.session import ATKConnection
             conn = ATKConnection(con_id=42, host="127.0.0.1", port=6655)
-            conn._connected = False  # already closed
+            conn._connected = False  # 已关闭
 
-            conn.close()  # should not call atkClose again
+            conn.close()  # 不应再次调用 atkClose
             mock_atk.atkClose.assert_not_called()
 
 
 class TestConnectionContextManager:
-    """Tests for the connect() context manager factory."""
+    """connect() 上下文管理器工厂的测试。"""
 
     def test_context_manager_closes_on_success(self) -> None:
         with patch("atk.connect.session._ATK") as mock_atk:
@@ -110,11 +110,11 @@ class TestConnectionContextManager:
 
 
 class TestATKConnectionManager:
-    """Tests for ATKConnectionManager."""
+    """ATKConnectionManager 的测试。"""
 
     def test_retry_on_failure(self) -> None:
         with patch("atk.connect.session._ATK") as mock_atk:
-            # Fail twice, succeed on third attempt
+            # 失败两次，第三次成功
             mock_atk.atkOpen.side_effect = [Exception("fail1"), Exception("fail2"), 55]
 
             from atk.connect.session import ATKConnectionManager

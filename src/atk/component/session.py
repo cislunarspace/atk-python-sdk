@@ -1,37 +1,38 @@
 """
-ATK Component Mode — Session Management
+ATK Component 模式 — 会话管理
 
-Provides ``ComponentSession`` (IAtkObjectRoot wrapper) and
-``component_session()`` context manager.
+提供 ``ComponentSession``（IAtkObjectRoot 封装）和
+``component_session()`` 上下文管理器。
 """
 
 from __future__ import annotations
 
 import os
 import sys
-from typing import Any
+from contextlib import contextmanager
+from typing import Any, Generator
 
 from atk import exceptions as _ex
 
 # ---------------------------------------------------------------------------
-# Locate ATK Component Python Module
+# 定位 ATK Component Python 模块
 # ---------------------------------------------------------------------------
 
-# The ATK Component DLL + Python wrapper live in the ATK installation.
-# By default we look next to this file's sibling _ATKComponentPythonModule.pyd,
-# or in the ATK install dir.  Users may also set ATK_ROOT env var.
+# ATK Component DLL + Python 封装位于 ATK 安装目录中。
+# 默认情况下，我们在此文件的同级目录中查找 _ATKComponentPythonModule.pyd，
+# 或在 ATK 安装目录中查找。用户也可以设置 ATK_ROOT 环境变量。
 
-_ATK_ROOT_ENV = os.environ.get("ATK_ROOT", r"C:\Users\ouyan\ATK\ATK-v4.0-rc.4")
+_ATK_ROOT_ENV = os.environ.get("ATK_ROOT", "")
 
 def _find_component_module() -> Any:
     """
-    Locate and import ATKComponentPythonModule.
+    定位并导入 ATKComponentPythonModule。
 
-    Strategy:
-    1. If already importable, use it.
-    2. Try sibling directory of this file (project-local copy).
-    3. Try ATK_ROOT from environment.
-    4. Add to sys.path and retry.
+    策略：
+    1. 如果已可导入，直接使用。
+    2. 尝试此文件的同级目录（项目本地副本）。
+    3. 尝试环境变量 ATK_ROOT。
+    4. 添加到 sys.path 后重试。
     """
     try:
         import ATKComponentPythonModule as m
@@ -40,9 +41,9 @@ def _find_component_module() -> Any:
         pass
 
     candidates = [
-        os.path.join(os.path.dirname(__file__), "..", "..", "vendored"),  # vendored/ at repo root
-        os.path.join(os.path.dirname(__file__), "..", ".."),             # repo root
-        os.path.join(_ATK_ROOT_ENV),                                     # ATK install
+        os.path.join(os.path.dirname(__file__), "..", "..", "vendored"),  # 仓库根目录的 vendored/
+        os.path.join(os.path.dirname(__file__), "..", ".."),             # 仓库根目录
+        os.path.join(_ATK_ROOT_ENV),                                     # ATK 安装目录
     ]
 
     for candidate in candidates:
@@ -64,17 +65,13 @@ def _find_component_module() -> Any:
 
 
 # ---------------------------------------------------------------------------
-# Import the module (may raise ATKComponentError above)
+# 导入模块（可能抛出上方的 ATKComponentError）
 # ---------------------------------------------------------------------------
-try:
-    _ATK = _find_component_module()
-except _ex.ATKComponentError:
-    # Surface the error at import time with a clear message
-    raise
+_ATK = _find_component_module()
 
 
 # ---------------------------------------------------------------------------
-# Propagator type enum values (from SWIG wrapper)
+# 传播器类型枚举值（来自 SWIG 封装）
 # ---------------------------------------------------------------------------
 _PROPAGATOR_NAMES = {
     "PropagatorTwoBody":        getattr(_ATK, "ePropagatorTwoBody", None),
@@ -92,7 +89,7 @@ _PROPAGATOR_NAMES = {
 
 
 def _resolve_propagator_type(name_or_enum: Any) -> Any:
-    """Convert a propagator name string to the SWIG enum value."""
+    """将传播器名称字符串转换为 SWIG 枚举值。"""
     if isinstance(name_or_enum, str):
         enum = _PROPAGATOR_NAMES.get(name_or_enum)
         if enum is None:
@@ -105,22 +102,22 @@ def _resolve_propagator_type(name_or_enum: Any) -> Any:
 
 
 # ---------------------------------------------------------------------------
-# ComponentSession — IAtkObjectRoot wrapper
+# ComponentSession — IAtkObjectRoot 封装
 # ---------------------------------------------------------------------------
 
 class ComponentSession:
     """
-    High-level wrapper around ATK's ``IAtkObjectRoot`` for Component mode.
+    ATK Component 模式下 ``IAtkObjectRoot`` 的高级封装。
 
     Attributes
     ----------
     root : IAtkObjectRoot
-        The underlying SWIG wrapper object.
-    scenario : IScenario or None
-        The currently loaded scenario (set by :meth:`load_scenario` or
-        :meth:`new_scenario`).
+        底层 SWIG 封装对象。
+    scenario : IScenario 或 None
+        当前加载的场景（由 :meth:`load_scenario` 或
+        :meth:`new_scenario` 设置）。
 
-    Example::
+    示例::
 
         with component_session() as session:
             session.new_scenario('MyScenario')
@@ -135,27 +132,27 @@ class ComponentSession:
         self._scenario: Any = None
 
     # ------------------------------------------------------------------
-    # Scenario lifecycle
+    # 场景生命周期
     # ------------------------------------------------------------------
 
     def new_scenario(self, name: str) -> Any:
         """
-        Create a new scenario.
+        创建新场景。
 
         Parameters
         ----------
         name : str
-            Scenario name.
+            场景名称。
 
         Returns
         -------
         IScenario
-            The newly created scenario object.
+            新创建的场景对象。
 
         Raises
         ------
         ATKScenarioError
-            If a scenario already exists.
+            如果场景已存在。
         """
         if self._scenario is not None:
             raise _ex.ATKScenarioError(
@@ -167,13 +164,13 @@ class ComponentSession:
 
     def load_scenario(self, path: str) -> Any:
         """
-        Load an existing scenario from an XML file.
+        从 XML 文件加载已有场景。
 
         Parameters
         ----------
         path : str
-            Absolute or ATK-relative scenario path
-            (e.g. ``"C:/ATK/Scenarios/Scenario1.xml"``).
+            绝对或 ATK 相对场景路径
+            （如 ``"C:/ATK/Scenarios/Scenario1.xml"``）。
 
         Returns
         -------
@@ -188,20 +185,20 @@ class ComponentSession:
         return self._scenario
 
     def close_scenario(self) -> None:
-        """Close the current scenario without saving."""
+        """关闭当前场景（不保存）。"""
         if self._scenario is not None:
             self.root.CloseScenario()
             self._scenario = None
 
     def save_scenario(self, path: str | None = None) -> None:
         """
-        Save the current scenario.
+        保存当前场景。
 
         Parameters
         ----------
         path : str, optional
-            Save path. If omitted, saves to the scenario's current path
-            (or prompts ATK to ask for one if it's a new scenario).
+            保存路径。如果省略，保存到场景当前路径
+            （如果是新场景，ATK 会提示选择路径）。
         """
         if self._scenario is None:
             raise _ex.ATKScenarioError("No scenario is currently loaded.")
@@ -212,7 +209,7 @@ class ComponentSession:
 
     @property
     def scenario(self) -> Any:
-        """Return the currently loaded scenario (or None)."""
+        """返回当前加载的场景（或 None）。"""
         return self._scenario
 
     @property
@@ -220,18 +217,18 @@ class ComponentSession:
         return self._scenario is not None
 
     # ------------------------------------------------------------------
-    # Object creation helpers
+    # 对象创建辅助方法
     # ------------------------------------------------------------------
 
     def create_satellite(self, name: str) -> Any:
         """
-        Create a new satellite in the current scenario.
+        在当前场景中创建新卫星。
 
-        Requires a scenario to be loaded first.
+        需要先加载场景。
 
         Returns
         -------
-        ISatellite wrapper (see ``atk.component.satellite`` for a higher-level class).
+        ISatellite 封装（参见 ``atk.component.satellite`` 获取更高级的类）。
         """
         if self._scenario is None:
             raise _ex.ATKScenarioError("Create a scenario first with new_scenario() or load_scenario().")
@@ -241,11 +238,11 @@ class ComponentSession:
 
     def get_object(self, path: str) -> Any:
         """
-        Retrieve an object by its ATK path (e.g. ``"Satellite/Sat1"``).
+        通过 ATK 路径检索对象（如 ``"Satellite/Sat1"``）。
 
         Returns
         -------
-        IAtkObject (cast to the appropriate type by the caller).
+        IAtkObject（由调用方转换为适当类型）。
         """
         obj = self.root.GetObjectFromPath(path)
         if obj is None:
@@ -253,23 +250,23 @@ class ComponentSession:
         return obj
 
     def object_exists(self, path: str) -> bool:
-        """Check whether an object exists at the given path."""
+        """检查指定路径是否存在对象。"""
         return self.root.ObjectExists(path)
 
     # ------------------------------------------------------------------
-    # Animation control
+    # 动画控制
     # ------------------------------------------------------------------
 
     def play(self) -> None:
-        """Start forward animation of the current scenario."""
+        """正向播放当前场景的动画。"""
         self.root.GetAnimation().PlayForward()
 
     def reset(self) -> None:
-        """Reset animation to the start time."""
+        """将动画重置到开始时间。"""
         self.root.GetAnimation().Reset()
 
     # ------------------------------------------------------------------
-    # Report export
+    # 报告导出
     # ------------------------------------------------------------------
 
     def output_report(
@@ -281,28 +278,28 @@ class ComponentSession:
         output_path: str | None = None,
     ) -> str:
         """
-        Generate a data report and optionally save to a file.
+        生成数据报告并可选地保存到文件。
 
         Parameters
         ----------
         obj : IAtkObject
-            The object to generate the report for (e.g. ISatellite).
+            要生成报告的对象（如 ISatellite）。
         report_type : str
-            Report style name (e.g. ``"J2000 Position Velocity"``).
+            报告样式名称（如 ``"J2000 Position Velocity"``）。
         start : str
-            Start time string (ATK format, e.g. ``"5 Nov 2022 00:00:00.000"``).
+            开始时间字符串（ATK 格式，如 ``"5 Nov 2022 00:00:00.000"``）。
         stop : str
-            Stop time string.
+            结束时间字符串。
         output_path : str, optional
-            Output file path. If None, returns the default output path.
+            输出文件路径。如果为 None，返回默认输出路径。
 
         Returns
         -------
         str
-            Path to the generated report file.
+            生成的报告文件路径。
         """
         if output_path:
-            # ATK's OutputDataReport returns a path string
+            # ATK 的 OutputDataReport 返回路径字符串
             return self.root.OutputDataReport(obj, report_type, start, stop, output_path)
         return self.root.OutputDataReport(obj, report_type, start, stop)
 
@@ -312,14 +309,15 @@ class ComponentSession:
 
 
 # ---------------------------------------------------------------------------
-# Context manager factory
+# 上下文管理器工厂
 # ---------------------------------------------------------------------------
 
-def component_session() -> ComponentSession:
+@contextmanager
+def component_session() -> Generator[ComponentSession, None, None]:
     """
-    Context manager that creates and tears down an ATK Component session.
+    创建和销毁 ATK Component 会话的上下文管理器。
 
-    Usage::
+    用法::
 
         with component_session() as session:
             session.new_scenario('MyScenario')

@@ -1,7 +1,7 @@
 """
-ATK Component Mode — Scenario Builder
+ATK Component 模式 — 场景构建器
 
-Wraps ``IScenario`` with a Pythonic fluent API.
+用 Python 风格的流式 API 封装 ``IScenario``。
 """
 
 from __future__ import annotations
@@ -14,12 +14,12 @@ if TYPE_CHECKING:
 
 class ScenarioBuilder:
     """
-    Pythonic wrapper around ATK's ``IScenario`` (Component mode).
+    ATK Component 模式下 ``IScenario`` 的 Python 风格封装。
 
-    Created via :meth:`ComponentSession.new_scenario()` or
-    :meth:`ComponentSession.load_scenario()`.
+    通过 :meth:`ComponentSession.new_scenario()` 或
+    :meth:`ComponentSession.load_scenario()` 创建。
 
-    Example::
+    示例::
 
         with component_session() as session:
             scenario = session.new_scenario('MyMission')
@@ -33,72 +33,72 @@ class ScenarioBuilder:
         self._scenario = scenario_obj
 
     # ------------------------------------------------------------------
-    # Properties
+    # 属性
     # ------------------------------------------------------------------
 
     @property
     def name(self) -> str:
-        """Return the scenario's instance name."""
+        """返回场景的实例名称。"""
         return self._scenario.GetInstanceName()
 
     @property
     def path(self) -> str:
-        """Return the scenario's full ATK path."""
+        """返回场景的完整 ATK 路径。"""
         return self._scenario.GetPath()
 
     @property
     def scenario(self) -> Any:
-        """Return the raw ``IScenario`` SWIG object."""
+        """返回原始 ``IScenario`` SWIG 对象。"""
         return self._scenario
 
     # ------------------------------------------------------------------
-    # Time configuration
+    # 时间配置
     # ------------------------------------------------------------------
 
     def set_analysis_period(self, start: str, stop: str) -> "ScenarioBuilder":
         """
-        Set the analysis time period.
+        设置分析时间段。
 
         Parameters
         ----------
         start : str
-            Start time string (e.g. ``"5 Nov 2022 00:00:00.000"``).
+            开始时间字符串（如 ``"5 Nov 2022 00:00:00.000"``）。
         stop : str
-            Stop time string.
+            结束时间字符串。
         """
         self._scenario.SetTimePeriod(start, stop)
         return self
 
     def set_start_time(self, start: str) -> "ScenarioBuilder":
-        """Set the scenario start time."""
+        """设置场景开始时间。"""
         self._scenario.SetStartTime(start)
         return self
 
     def set_stop_time(self, stop: str) -> "ScenarioBuilder":
-        """Set the scenario stop time."""
+        """设置场景结束时间。"""
         self._scenario.SetStopTime(stop)
         return self
 
     def get_start_time(self) -> str:
-        """Return the scenario start time as a string."""
+        """返回场景开始时间字符串。"""
         return self._scenario.GetStartTime()
 
     def get_stop_time(self) -> str:
-        """Return the scenario stop time as a string."""
+        """返回场景结束时间字符串。"""
         return self._scenario.GetStopTime()
 
     # ------------------------------------------------------------------
-    # Scenario lifecycle
+    # 场景生命周期
     # ------------------------------------------------------------------
 
     def save(self, path: str | None = None) -> "ScenarioBuilder":
         """
-        Save the scenario.
+        保存场景。
 
         Parameters
         ----------
         path : str, optional
-            Save path. If omitted, saves to the scenario's current path.
+            保存路径。如果省略，保存到场景当前路径。
         """
         if path:
             self._session.root.SaveScenario(path)
@@ -107,27 +107,27 @@ class ScenarioBuilder:
         return self
 
     def close(self) -> None:
-        """Close this scenario."""
+        """关闭此场景。"""
         self._session.root.CloseScenario()
 
     # ------------------------------------------------------------------
-    # Object creation
+    # 对象创建
     # ------------------------------------------------------------------
 
     def create_satellite(self, name: str) -> Any:
         """
-        Create a new satellite in this scenario.
+        在此场景中创建新卫星。
 
         Parameters
         ----------
         name : str
-            Satellite name.
+            卫星名称。
 
         Returns
         -------
         ISatellite
-            The raw SWIG satellite object.
-            See :mod:`atk.component.satellite` for a higher-level wrapper.
+            原始 SWIG 卫星对象。
+            参见 :mod:`atk.component.satellite` 获取更高级的封装。
         """
         children = self._scenario.GetChildren()
         sat = children.New(_get_enum("eSatellite"), name)
@@ -135,7 +135,7 @@ class ScenarioBuilder:
 
     def get_object(self, path: str) -> Any:
         """
-        Retrieve a child object by path (e.g. ``"Satellite/Sat1"``).
+        通过路径检索子对象（如 ``"Satellite/Sat1"``）。
 
         Returns
         -------
@@ -144,26 +144,26 @@ class ScenarioBuilder:
         return self._session.root.GetObjectFromPath(path)
 
     def get_satellites(self) -> list[Any]:
-        """Return all satellites in this scenario."""
+        """返回此场景中的所有卫星。"""
         children = self._scenario.GetChildren()
         return _collect_children_by_type(children, _get_enum("eSatellite"))
 
     # ------------------------------------------------------------------
-    # Animation
+    # 动画
     # ------------------------------------------------------------------
 
     def play(self) -> "ScenarioBuilder":
-        """Start forward animation."""
+        """正向播放动画。"""
         self._scenario.GetRoot().GetAnimation().PlayForward()
         return self
 
     def reset(self) -> "ScenarioBuilder":
-        """Reset animation to the start time."""
+        """将动画重置到开始时间。"""
         self._scenario.GetRoot().GetAnimation().Reset()
         return self
 
     # ------------------------------------------------------------------
-    # String representation
+    # 字符串表示
     # ------------------------------------------------------------------
 
     def __repr__(self) -> str:
@@ -171,17 +171,17 @@ class ScenarioBuilder:
 
 
 # ---------------------------------------------------------------------------
-# Internal helpers
+# 内部辅助方法
 # ---------------------------------------------------------------------------
 
 def _get_enum(name: str) -> Any:
-    """Resolve a propagator/object enum from the ATK module."""
+    """从 ATK 模块解析传播器/对象枚举。"""
     from atk.component import session as _s
     return getattr(_s._ATK, name)
 
 
 def _collect_children_by_type(collection: Any, etype: Any) -> list[Any]:
-    """Collect all children of a given type from an IAtkObjectCollection."""
+    """从 IAtkObjectCollection 中收集指定类型的所有子对象。"""
     results = []
     for i in range(collection.GetCount()):
         item = collection.Item(i)

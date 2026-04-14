@@ -1,7 +1,7 @@
 """
-ATK Component Mode — Satellite Builder
+ATK Component 模式 — 卫星构建器
 
-Wraps ``ISatellite`` and ``IVADriverMCS`` with a Pythonic fluent API.
+用 Python 风格的流式 API 封装 ``ISatellite`` 和 ``IVADriverMCS``。
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from atk.component.scenario import ScenarioBuilder
 
 
-# Propagator string name → SWIG enum
+# 传播器字符串名称 → SWIG 枚举
 _PROPAGATOR_MAP = {
     "PropagatorTwoBody":        "ePropagatorTwoBody",
     "PropagatorJ2Perturbation": "ePropagatorJ2Perturbation",
@@ -33,11 +33,11 @@ _PROPAGATOR_MAP = {
 
 class SatelliteBuilder:
     """
-    Pythonic wrapper around ATK's ``ISatellite`` (Component mode).
+    ATK Component 模式下 ``ISatellite`` 的 Python 风格封装。
 
-    Created via :meth:`ScenarioBuilder.create_satellite() <atk.component.scenario.ScenarioBuilder.create_satellite>`.
+    通过 :meth:`ScenarioBuilder.create_satellite() <atk.component.scenario.ScenarioBuilder.create_satellite>` 创建。
 
-    Example::
+    示例::
 
         sat = scenario.create_satellite('Sat1')
         sat.set_propagator_type('PropagatorAstromaster')
@@ -51,7 +51,7 @@ class SatelliteBuilder:
         self._driver: Any | None = None
 
     # ------------------------------------------------------------------
-    # Properties
+    # 属性
     # ------------------------------------------------------------------
 
     @property
@@ -64,22 +64,22 @@ class SatelliteBuilder:
 
     @property
     def satellite(self) -> Any:
-        """Return the raw ``ISatellite`` SWIG object."""
+        """返回原始 ``ISatellite`` SWIG 对象。"""
         return self._sat
 
     # ------------------------------------------------------------------
-    # Propagator configuration
+    # 传播器配置
     # ------------------------------------------------------------------
 
     def set_propagator_type(self, propagator: str | Any) -> "SatelliteBuilder":
         """
-        Set the propagator type.
+        设置传播器类型。
 
         Parameters
         ----------
         propagator : str
-            Propagator name (e.g. ``"PropagatorAstromaster"``).
-            Or the raw SWIG enum value.
+            传播器名称（如 ``"PropagatorAstromaster"``）。
+            或原始 SWIG 枚举值。
         """
         if isinstance(propagator, str):
             enum_name = _PROPAGATOR_MAP.get(propagator)
@@ -93,12 +93,12 @@ class SatelliteBuilder:
             enum = propagator
 
         self._sat.SetPropagatorType(enum)
-        self._driver = None  # reset driver cache
+        self._driver = None  # 重置驱动器缓存
         return self
 
     def get_mcs_driver(self) -> Any:
         """
-        Get the MCS (Mission Control Sequence) driver for this satellite.
+        获取此卫星的 MCS（任务控制序列）驱动器。
 
         Returns
         -------
@@ -109,7 +109,7 @@ class SatelliteBuilder:
         return self._driver
 
     # ------------------------------------------------------------------
-    # Orbital state
+    # 轨道状态
     # ------------------------------------------------------------------
 
     def set_keplerian(
@@ -123,27 +123,27 @@ class SatelliteBuilder:
         epoch: str | None = None,
     ) -> "SatelliteBuilder":
         """
-        Set orbital state via Keplerian elements through the MCS driver.
+        通过 MCS 驱动器使用开普勒元素设置轨道状态。
 
-        Note: This method accesses the MCS InitialState segment properties.
-        The satellite must have a propagator set first.
+        注意：此方法访问 MCS InitialState 段的属性。
+        卫星必须先设置传播器。
 
         Parameters
         ----------
         sma : float
-            Semi-major axis (km).
+            半长轴（km）。
         ecc : float
-            Eccentricity.
+            离心率。
         inc : float
-            Inclination (degrees).
+            轨道倾角（度）。
         raan : float
-            Right ascension of ascending node (degrees).
+            升交点赤经（度）。
         argp : float
-            Argument of periapsis (degrees).
+            近地点幅角（度）。
         ta : float
-            True anomaly (degrees).
+            真近点角（度）。
         epoch : str, optional
-            Epoch time string.
+            历元时间字符串。
 
         Returns
         -------
@@ -158,8 +158,8 @@ class SatelliteBuilder:
                 "Use McsBuilder to build the segment sequence before setting state."
             )
 
-        # Walk the segment tree to find the InitialState segment
-        # The first segment is typically the InitialState segment
+        # 遍历段树以查找 InitialState 段
+        # 第一个段通常是 InitialState 段
         seg = _find_initial_state_segment(seq)
         if seg is None:
             raise _ex.ATKSatelliteError("Could not find InitialState segment in MCS.")
@@ -190,13 +190,13 @@ class SatelliteBuilder:
         epoch: str | None = None,
     ) -> "SatelliteBuilder":
         """
-        Set orbital state via Cartesian elements.
+        使用笛卡尔坐标元素设置轨道状态。
 
         Returns
         -------
         self
         """
-        # Similar to set_keplerian but sets CartesianX/Y/Z/VX/VY/VZ
+        # 类似 set_keplerian，但设置 CartesianX/Y/Z/VX/VY/VZ
         driver = self.get_mcs_driver()
         seq = driver.GetMainSequence()
         seg = _find_initial_state_segment(seq)
@@ -214,12 +214,12 @@ class SatelliteBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # Mass properties
+    # 质量属性
     # ------------------------------------------------------------------
 
     def set_mass(self, total_mass: float) -> "SatelliteBuilder":
         """
-        Set the satellite's total mass (kg).
+        设置卫星的总质量（kg）。
 
         Returns
         -------
@@ -235,7 +235,7 @@ class SatelliteBuilder:
         wet_mass: float,
     ) -> "SatelliteBuilder":
         """
-        Set dry and wet mass for stage modeling.
+        设置干质量和湿质量，用于阶段建模。
 
         Returns
         -------
@@ -247,18 +247,18 @@ class SatelliteBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # Attitude
+    # 姿态
     # ------------------------------------------------------------------
 
     def set_attitude_type(self, attitude_type: str | Any) -> "SatelliteBuilder":
         """
-        Set the satellite's attitude type.
+        设置卫星的姿态类型。
 
         Parameters
         ----------
         attitude_type : str
-            Attitude type name (e.g. ``"CBF"``, ``"J2000"``).
-            Or the raw SWIG enum value.
+            姿态类型名称（如 ``"CBF"``、``"J2000"``）。
+            或原始 SWIG 枚举值。
         """
         if isinstance(attitude_type, str):
             enum_name = f"eAttitude{attitude_type.capitalize()}"
@@ -272,12 +272,12 @@ class SatelliteBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # Graphics
+    # 图形
     # ------------------------------------------------------------------
 
     def set_color(self, color_index: int) -> "SatelliteBuilder":
         """
-        Set the satellite's graphics color by ATK color index.
+        通过 ATK 颜色索引设置卫星的图形颜色。
 
         Returns
         -------
@@ -288,7 +288,7 @@ class SatelliteBuilder:
         return self
 
     # ------------------------------------------------------------------
-    # String representation
+    # 字符串表示
     # ------------------------------------------------------------------
 
     def __repr__(self) -> str:
@@ -296,19 +296,19 @@ class SatelliteBuilder:
 
 
 # ---------------------------------------------------------------------------
-# Internal helpers
+# 内部辅助方法
 # ---------------------------------------------------------------------------
 
 def _find_initial_state_segment(seq: Any) -> Any | None:
     """
-    Walk the MCS segment collection to find the InitialState segment.
+    遍历 MCS 段集合以查找 InitialState 段。
 
-    Returns the segment or None if not found.
+    返回找到的段或 None。
     """
     for i in range(seq.GetCount()):
         seg = seq.Item(i)
         seg_type = seg.GetType() if hasattr(seg, "GetType") else ""
-        # Type is typically a string or enum — check for "InitialState"
+        # 类型通常是字符串或枚举 — 检查是否包含 "InitialState"
         type_str = str(seg_type)
         if "InitialState" in type_str or "Initial" in type_str:
             return seg
@@ -317,16 +317,16 @@ def _find_initial_state_segment(seq: Any) -> Any | None:
 
 def _set_segment_property(props: Any, name: str, value: float | str) -> None:
     """
-    Set a named property on an MCS segment properties object.
+    在 MCS 段属性对象上设置命名属性。
 
-    Uses the SetValue / SetProperty pattern observed in ATK Component API.
+    使用 ATK Component API 中观察到的 SetValue / SetProperty 模式。
     """
     if hasattr(props, "SetValue"):
         props.SetValue(name, value)
     elif hasattr(props, f"Set{name}"):
         getattr(props, f"Set{name}")(value)
     else:
-        # Last resort — try SetXxx pattern
+        # 最后手段 — 尝试 SetXxx 模式
         setter = getattr(props, f"Set{name}", None)
         if setter:
             setter(value)
