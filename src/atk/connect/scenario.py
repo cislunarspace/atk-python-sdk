@@ -71,9 +71,12 @@ class ScenarioBuilder:
         # 如果场景已加载，NACK 是预期行为 — 无需处理。
         try:
             self._conn.send("New", "/", f" Scenario {self._name}")
-        except _ex.ATKCommandError:
-            # 场景已存在；直接使用
-            pass
+        except _ex.ATKCommandError as exc:
+            # 场景已存在时 ATK 返回 NACK，这是预期行为。
+            # 但如果是其他命令错误（如权限问题），传播异常。
+            resp = str(exc).upper()
+            if "NACK" not in resp:
+                raise
         return self
 
     def save(self, path: str | None = None) -> "ScenarioBuilder":

@@ -209,8 +209,14 @@ class WalkerBuilder:
             try:
                 self._conn.send("RunMCS", sat_path, "")
                 results[sat_name] = True
-            except Exception:
+            except _ex.ATKError as exc:
                 results[sat_name] = False
+                import warnings
+                warnings.warn(
+                    f"MCS run failed for {sat_name}: {exc}",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
 
         return results
 

@@ -85,6 +85,7 @@ _PROPAGATOR_NAMES = {
     "PropagatorJ4Perturbation": getattr(_ATK, "ePropagatorJ4Perturbation", None),
     "PropagatorVinti":         getattr(_ATK, "ePropagatorVinti", None),
     "PropagatorBallistic":     getattr(_ATK, "ePropagatorBallistic", None),
+    "PropagatorLOP":           getattr(_ATK, "ePropagatorLOP", None),
 }
 
 

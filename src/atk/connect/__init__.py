@@ -24,6 +24,7 @@ from atk.connect import mcs  # noqa: F401
 from atk.connect import coverage  # noqa: F401
 from atk.connect import constellation  # noqa: F401
 from atk.connect import facility  # noqa: F401
+from atk.connect import reports  # noqa: F401
 
 __all__ = [
     "ATKConnection",

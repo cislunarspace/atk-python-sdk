@@ -4,18 +4,7 @@ atk.connect.facility 的单元测试 — FacilityBuilder 和 SensorBuilder。
 
 from unittest.mock import MagicMock
 
-
-class MockATKConnection:
-    """最小 ATKConnection 模拟。"""
-
-    def __init__(self) -> None:
-        self.calls: list[tuple[str, str, str]] = []
-
-    def send(self, command: str, obj_path: str = "*", param: str = "") -> MagicMock:
-        self.calls.append((command, obj_path, param))
-        result = MagicMock()
-        result.m_vectData = "OK"
-        return result
+from tests.connect.conftest import MockATKConnection
 
 
 class TestFacilityBuilder:

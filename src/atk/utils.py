@@ -5,9 +5,7 @@ ATK Python SDK 共享工具函数。
 from __future__ import annotations
 
 import re
-import warnings
 from datetime import datetime
-from typing import Callable
 
 from atk.exceptions import ATKValueError
 

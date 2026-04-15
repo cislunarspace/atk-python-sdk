@@ -126,10 +126,6 @@ class ATKConnection:
         input_str = f"{obj_path} {param}".strip()
         result = _ATK.atkConnect(self.con_id, command, input_str)
 
-        # 打印命令发送和响应，便于调试
-        print(f"[ATK] --> {command} {obj_path!r} {param!r}")
-        print(f"[ATK] <-- {result!r}")
-
         # atkConnect() 可能返回 str（如 "NACK"、"ACK"）或 CMDRESULT — 两种都要处理
         if isinstance(result, str):
             raw = result.strip()

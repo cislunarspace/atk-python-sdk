@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from atk import exceptions as _ex
 from atk import utils
 
 if TYPE_CHECKING:
@@ -215,15 +216,24 @@ class CoverageStats:
 
     @property
     def access_count(self) -> int:
-        return int(self._parsed.get("AccessCount", 0))
+        try:
+            return int(self._parsed.get("AccessCount", 0))
+        except (ValueError, TypeError) as exc:
+            raise _ex.ATKError(f"Failed to parse access_count: {exc}") from exc
 
     @property
     def total_access_time(self) -> float:
-        return float(self._parsed.get("TotalAccessTime", 0.0))
+        try:
+            return float(self._parsed.get("TotalAccessTime", 0.0))
+        except (ValueError, TypeError) as exc:
+            raise _ex.ATKError(f"Failed to parse total_access_time: {exc}") from exc
 
     @property
     def mean_access_duration(self) -> float:
-        return float(self._parsed.get("MeanAccessDuration", 0.0))
+        try:
+            return float(self._parsed.get("MeanAccessDuration", 0.0))
+        except (ValueError, TypeError) as exc:
+            raise _ex.ATKError(f"Failed to parse mean_access_duration: {exc}") from exc
 
     def __repr__(self) -> str:
         return (

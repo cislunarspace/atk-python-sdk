@@ -5,23 +5,7 @@ atk.connect.scenario 的单元测试 — ScenarioBuilder。
 import pytest
 from unittest.mock import MagicMock, patch
 
-
-class MockATKConnection:
-    """ScenarioBuilder 测试的最小 ATKConnection 模拟。"""
-
-    def __init__(self) -> None:
-        self.calls: list[tuple[str, str, str]] = []
-        self._connected = True
-
-    def send(self, command: str, obj_path: str = "*", param: str = "") -> MagicMock:
-        self.calls.append((command, obj_path, param))
-        result = MagicMock()
-        result.m_vectData = "OK"
-        return result
-
-    @property
-    def is_connected(self) -> bool:
-        return self._connected
+from tests.connect.conftest import MockATKConnection
 
 
 class TestScenarioBuilder:

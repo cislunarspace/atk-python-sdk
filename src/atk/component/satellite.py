@@ -28,6 +28,7 @@ _PROPAGATOR_MAP = {
     "PropagatorJ4Perturbation": "ePropagatorJ4Perturbation",
     "PropagatorVinti":         "ePropagatorVinti",
     "PropagatorBallistic":     "ePropagatorBallistic",
+    "PropagatorLOP":           "ePropagatorLOP",
 }
 
 
@@ -326,12 +327,7 @@ def _set_segment_property(props: Any, name: str, value: float | str) -> None:
     elif hasattr(props, f"Set{name}"):
         getattr(props, f"Set{name}")(value)
     else:
-        # 最后手段 — 尝试 SetXxx 模式
-        setter = getattr(props, f"Set{name}", None)
-        if setter:
-            setter(value)
-        else:
-            raise _ex.ATKMCSError(
-                f"Segment properties object has no setter for {name!r}. "
-                f"Available: {[a for a in dir(props) if a.startswith('Set')]}"
-            )
+        raise _ex.ATKMCSError(
+            f"Segment properties object has no setter for {name!r}. "
+            f"Available: {[a for a in dir(props) if a.startswith('Set')]}"
+        )
