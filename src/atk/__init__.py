@@ -35,7 +35,7 @@ Component 模式示例::
 from atk import exceptions
 from atk import utils
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 
 __all__ = [
     "exceptions",
