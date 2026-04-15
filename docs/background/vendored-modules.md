@@ -35,12 +35,17 @@ ATKConnectModule.atkClose(conID)
 
 ### 返回值
 
-`atkConnect` 返回 `CMDRESULT` 对象，包含：
+`atkConnect` 可能返回两种类型：
+
+1. **`str`** — 简单命令的响应（如 `"ACK"`、`"NACK"`）
+2. **`CMDRESULT`** — 复杂命令（如报告）的响应对象
 
 | 属性/方法 | 说明 |
 |-----------|------|
-| `m_vectData` | 空格分隔的结果字符串 |
-| `Item(i)` | 按索引访问（零基） |
+| `m_vectData` | 空格分隔的结果字符串（仅 CMDRESULT） |
+| `Item(i)` | 按索引访问（零基，仅 CMDRESULT） |
+
+SDK 的 `ATKConnection.send()` 方法内部统一处理这两种返回类型，用户无需关心区别。
 
 ## ATKComponentPythonModule.py
 
@@ -98,6 +103,20 @@ export ATK_ROOT=/opt/ATK/ATK-v4.0
 ```
 
 SDK 会自动在 `ATK_ROOT` 目录下查找 `ATKComponentPythonModule.py`。
+
+## 类型存根文件
+
+`src/atk/connect/session.pyi` 为 `ATKConnection` 提供类型提示，包括通过猴子补丁注入的工厂方法。这使得 IDE 能正确提供自动补全：
+
+- `create_scenario()`
+- `create_satellite()`
+- `create_facility()`
+- `mcs_builder()`
+- `create_coverage()`
+- `constellation_builder()`
+- `quick_report()`
+- `report_rm()`
+- `send_str()`
 
 ## 版本兼容性
 

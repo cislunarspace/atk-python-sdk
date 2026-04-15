@@ -159,6 +159,56 @@ parse_atk_time("2023/07/29")
 parse_atk_time("2023-07-29")
 ```
 
+## 地面站和传感器问题
+
+### 地面站创建失败
+
+**错误信息**：
+```
+ATKCommandError: Command 'New' failed for '/'
+```
+
+**可能原因**：
+- 地面站名称包含特殊字符
+- ATK 场景未加载
+
+**解决方法**：
+1. 使用纯字母数字名称
+2. 确保已创建场景：`atk.create_scenario('MyScenario')`
+
+### 传感器视场设置无效
+
+**现象**：设置视场后传感器行为不符合预期。
+
+**可能原因**：
+- 欧拉角转序不正确
+- 俯仰角/方位角范围无效
+
+**解决方法**：
+```python
+# 确保角度范围合理
+sensor.define_conical(el_start=5, el_end=85, az_start=0, az_end=360)
+# 检查欧拉角转序
+sensor.point_fixed_euler(sequence=123, a1=180, a2=0, a3=0)
+```
+
+### TLE 格式错误
+
+**错误信息**：
+```
+ATKCommandError: Command 'SetState' failed
+```
+
+**可能原因**：TLE 行长度不正确（应为 69 字符）。
+
+**解决方法**：
+```python
+# 确保 TLE 行格式正确（69 字符）
+line1 = '1 25544U 98067A   24001.50000000  .00016717  00000-0  10270-3 0  9000'
+line2 = '2 25544  51.6400 208.9163 0006703  44.2800 315.9700 15.49000000400000'
+sat.set_state_tle(line1=line1, line2=line2)
+```
+
 ## 报告生成问题
 
 ### 报告返回空
@@ -173,7 +223,37 @@ parse_atk_time("2023-07-29")
 2. 验证对象路径格式
 3. 确认报告类型是否适用
 
-### 报告格式不正确
+### 报告返回空 DataFrame
+
+**现象**：`to_dataframe()` 返回空 DataFrame。
+
+**可能原因**：
+- `atkConnect` 返回了 `str` 而非 `CMDRESULT`（SWIG DLL 行为不一致）
+- 分析时段内无数据
+
+**解决方法**：
+1. 检查 `result.data` 是否为空
+2. 确认分析时段包含仿真时间
+3. 确保已运行 MCS 或传播
+
+### CMDRESULT 返回类型异常
+
+**现象**：`send()` 返回原始字符串而非预期的 `CMDRESULT`。
+
+**原因**：SWIG DLL 的 `atkConnect()` 可能返回 `str` 或 `CMDRESULT`，取决于 ATK 版本和命令类型。
+
+**解决方法**：
+SDK 的 `send()` 方法已处理这种情况。如果直接处理 `send()` 返回值：
+
+```python
+result = atk.send('SomeCommand', '*', '')
+if isinstance(result, str):
+    # 字符串响应
+    pass
+else:
+    # CMDRESULT 对象
+    data = result.m_vectData
+```
 
 **可能原因**：
 - 报告样式名称错误

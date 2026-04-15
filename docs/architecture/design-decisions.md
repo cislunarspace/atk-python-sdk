@@ -148,3 +148,66 @@ Component 模式同时支持 `component_session()` 上下文管理器和直接�
 - 上下文管理器适合简单场景
 - 直接实例化适合复杂场景（需要保持根对象引用）
 - API 灵活性与简洁性兼得
+
+## 10. 猴子补丁模式 (Monkey-Patching)
+
+### 决策
+
+每个 Connect 子模块（scenario、satellite、facility、mcs、coverage、constellation、reports）在导入时调用 `_patch_connection()`，向 `ATKConnection` 注入工厂方法。
+
+### 理由
+
+**问题**：如果所有工厂方法都在 `session.py` 中定义，会导致循环导入（session → satellite → session）和臃肿的 session 模块。
+
+**解决方案**：
+
+```python
+# facility.py 末尾
+def _patch_connection():
+    from atk.connect import session as _s
+    _s.ATKConnection.create_facility = create_facility
+
+_patch_connection()
+```
+
+`connect/__init__.py` 导入所有子模块以触发补丁。这种模式将每个构建器的注册逻辑放在定义它的模块中，避免循环依赖。
+
+## 11. Facility 和 Sensor 的组合关系
+
+### 决策
+
+`SensorBuilder` 通过 `FacilityBuilder.create_sensor()` 创建，传感器挂在地面站下（`*/Facility/{name}/Sensor/{sensor}`），而非独立的工厂方法。
+
+### 理由
+
+- ATK 对象模型中 Sensor 是 Facility 的子对象
+- 传感器需要知道其父级地面站名称以构建正确路径
+- 组合创建模式（一次调用完成创建+配置）简化常见操作
+- 用户也可直接实例化 `SensorBuilder` 获得更细粒度的控制
+
+## 12. 类型存根文件 (.pyi)
+
+### 决策
+
+使用 `session.pyi` 为猴子补丁注入的方法提供类型提示。
+
+### 理由
+
+- 猴子补丁的方法无法被 IDE 静态分析发现
+- `.pyi` 存根文件让 IDE 能提供正确的自动补全和类型检查
+- 所有注入的工厂方法（`create_scenario`、`create_facility`、`quick_report` 等）都在存根中声明
+
+## 13. atkConnect 返回值的双重性
+
+### 决策
+
+`send()` 方法内部同时处理 `str` 和 `CMDRESULT` 两种返回类型。
+
+### 理由
+
+**问题**：SWIG DLL 的 `atkConnect()` 函数可能返回：
+
+- `str`：如 `"ACK"`、`"NACK"` — 简单命令的响应
+- `CMDRESULT`：带 `m_vectData` 属性 — 报告等复杂命令的响应
+
+这在 ATK 的 SWIG 封装中是已知行为。SDK 在 `send()` 中统一处理，对上层 API 透明。

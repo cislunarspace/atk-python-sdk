@@ -14,6 +14,11 @@ ATK 采用层次化的对象模型，所有对象都挂在场景（Scenario）�
 │       └── Receiver/    # 接收器
 ├── Facility/           # 地面设施
 │   └── GroundStation
+│       └── Sensor/      # 地面站敏感器
+│           └── Sensor1
+├── Constellation/      # 星座容器
+│   └── MyConstellation
+│       └── Satellite/  # 星座内的卫星
 ├── CoverageDefinition/ # 覆盖定义
 │   └── Coverage1
 ├── Aircraft/           # 飞机
@@ -51,9 +56,32 @@ ATK 采用层次化的对象模型，所有对象都挂在场景（Scenario）�
 
 ### 地面站 (Facility)
 
-地面站是固定位置的地面目标。
+地面站是固定位置的地面目标，可通过 Geodetic 坐标（纬度、经度、高度）定位。
 
 **对象路径**：`*/Facility/FacilityName`
+
+**主要子对象**：
+- Sensor（敏感器）— 挂在地面站下的传感器
+
+**SDK 支持**：通过 `FacilityBuilder` 创建和配置，支持 `create_sensor()` 在地面站下创建传感器。
+
+### 敏感器 (Sensor)
+
+敏感器可挂在卫星或地面站下，定义视场、指向和约束。
+
+**对象路径**：
+- 卫星下：`*/Satellite/Sat1/Sensor/Sensor1`
+- 地面站下：`*/Facility/Station1/Sensor/Sensor1`
+
+**SDK 支持**（地面站下）：通过 `SensorBuilder` 配置视场（`define_conical`）、指向（`point_fixed_euler`）、约束（`set_range_constraint`）。
+
+### 星座 (Constellation)
+
+星座是卫星的容器对象，用于组织和管理多颗卫星。
+
+**对象路径**：`*/Constellation/ConstellationName`
+
+**SDK 支持**：通过 `WalkerBuilder` 生成 Walker Delta 星座模式。
 
 ### 覆盖定义 (CoverageDefinition)
 
@@ -144,6 +172,15 @@ New / Scenario ScenarioName
 New / */Satellite Satellite1
 New / */Facility GroundStation
 New / */Satellite/Satellite1/Sensor Sensor1
+New / */Facility/GroundStation/Sensor Sensor1
+```
+
+SDK 中的地面站创建：
+
+```python
+facility = atk.create_facility('Beijing', lat=39.9, lon=116.4, height=50)
+sensor = facility.create_sensor('Sensor1', el_start=5, el_end=85,
+                                az_start=0, az_end=360, max_range=2000)
 ```
 
 ### Component 模式
