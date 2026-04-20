@@ -97,10 +97,9 @@ def format_atk_time(dt: datetime) -> str:
 
     注意：ATK 使用非零填充的日期（如 ``5`` 而非 ``05``）。
     """
-    # %-d 在 Windows 上不支持，所以先格式化再手动去前导零
-    date_part = dt.strftime("%d %b %Y")
-    day = str(dt.day)  # 非零填充
-    date_part = f"{day} {dt.strftime('%b %Y')}"
+    # 构建日期部分：day 是非零填充的月份日期
+    date_part = f"{dt.day} {dt:%b %Y}"
+    # 时间部分：去掉末尾的 .000 如果为整秒
     time_part = dt.strftime("%H:%M:%S.%f").rstrip("0").rstrip(".")
     return f"{date_part} {time_part}"
 
