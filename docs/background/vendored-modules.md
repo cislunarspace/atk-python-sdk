@@ -137,7 +137,7 @@ Vendored 模块应与 ATK 软件版本匹配：
 ImportError: ATKConnectModule not found in src/vendored/
 ```
 
-**解决方法**：确保使用 `pip install -e .` 安装 SDK，这会将 `vendored/` 目录添加到 `sys.path`。
+**解决方法**：确保使用 `uv sync` 安装 SDK，这会将 `vendored/` 目录添加到 `sys.path`。
 
 ### Component 模块导入失败
 
