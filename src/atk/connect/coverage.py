@@ -206,9 +206,24 @@ class CoverageStats:
                 result[key.strip()] = val.strip()
             else:
                 positional.append(item)
+        # 如果既没有 key=value 也没有足够的 position 数据，抛出异常
+        if not result and len(positional) < 3:
+            raise _ex.ATKError(
+                f"Unexpected CoverageStats format, expected 'key=value' pairs or "
+                f"at least 3 positional values, got: {data}"
+            )
         # 如果没有 key=value 对，尝试位置解析
         if not result and len(positional) >= 3:
             # [count, total_time, mean_dur, ...]
+            try:
+                int(positional[0])
+                float(positional[1])
+                float(positional[2])
+            except (ValueError, TypeError):
+                raise _ex.ATKError(
+                    f"Unexpected CoverageStats format, expected 'key=value' pairs or "
+                    f"at least 3 positional numeric values, got: {data}"
+                )
             result["AccessCount"] = positional[0]
             result["TotalAccessTime"] = positional[1]
             result["MeanAccessDuration"] = positional[2] if len(positional) > 2 else "0"
