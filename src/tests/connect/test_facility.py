@@ -2,6 +2,7 @@
 atk.connect.facility 的单元测试 — FacilityBuilder 和 SensorBuilder。
 """
 
+import pytest
 from unittest.mock import MagicMock
 
 from tests.connect.conftest import MockATKConnection
@@ -30,6 +31,26 @@ class TestFacilityBuilder:
         assert len(setpos_calls) == 1
         assert " Geodetic 39.9 116.4 50" == setpos_calls[0][2]
         assert ("Animate", "*", " Reset") in conn.calls
+
+    def test_set_position_rejects_invalid_lat(self):
+        from atk.connect.facility import FacilityBuilder
+        from atk import exceptions as atk_exc
+
+        conn = MockATKConnection()
+        fac = FacilityBuilder(conn, "Station1")
+
+        with pytest.raises(atk_exc.ATKValueError, match="between -90 and 90"):
+            fac.set_position(lat=95.0, lon=0.0, height=0.0)
+
+    def test_set_position_rejects_invalid_lon(self):
+        from atk.connect.facility import FacilityBuilder
+        from atk import exceptions as atk_exc
+
+        conn = MockATKConnection()
+        fac = FacilityBuilder(conn, "Station1")
+
+        with pytest.raises(atk_exc.ATKValueError, match="between -180 and 180"):
+            fac.set_position(lat=0.0, lon=200.0, height=0.0)
 
     def test_set_color(self) -> None:
         from atk.connect.facility import FacilityBuilder

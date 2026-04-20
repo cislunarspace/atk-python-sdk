@@ -96,6 +96,14 @@ class FacilityBuilder:
         -------
         self
         """
+        if not (-90.0 <= lat <= 90.0):
+            raise _ex.ATKValueError(
+                f"Latitude must be between -90 and 90 degrees, got {lat}"
+            )
+        if not (-180.0 <= lon <= 180.0):
+            raise _ex.ATKValueError(
+                f"Longitude must be between -180 and 180 degrees, got {lon}"
+            )
         self._lat = lat
         self._lon = lon
         self._height = height
