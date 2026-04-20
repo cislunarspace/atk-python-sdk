@@ -1,0 +1,2523 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="ATK (Aerospace Tool Kit) Python SDK 高层次封装文档">
+      
+      
+        <meta name="author" content="ATK SDK Contributors">
+      
+      
+      
+        <link rel="prev" href="../../guides/troubleshooting/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>ATK Connect 命令 - ATK Python SDK 文档</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#atk-connect" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="ATK Python SDK 文档" class="md-header__button md-logo" aria-label="ATK Python SDK 文档" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ATK Python SDK 文档
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ATK Connect 命令
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换深色模式"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="切换深色模式" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换浅色模式"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="切换浅色模式" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/cislunarspace/atk-python-sdk" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="ATK Python SDK 文档" class="md-nav__button md-logo" aria-label="ATK Python SDK 文档" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ATK Python SDK 文档
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/cislunarspace/atk-python-sdk" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    架构
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/connect-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Connect 模式
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/component-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Component 模式
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/design-decisions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    设计决策
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    背景知识
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    背景知识
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../background/atk-object-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ATK 对象模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../background/time-and-units/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    时间和单位
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../background/vendored-modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vendored 模块
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    指南
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    指南
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    快速开始
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/orbital-mechanics-primer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    轨道力学基础
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    故障排查
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    参考
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    参考
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ATK Connect 命令
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ATK Connect 命令
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        概述
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        命令格式
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="命令格式">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        基本格式
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        参数分隔符
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        场景命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="场景命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New — 新建场景或对象
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#save-saveas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Save / SaveAs — 保存场景
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#load" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Load — 加载场景
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unload — 卸载对象或场景
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setanalysistimeperiod" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetAnalysisTimePeriod — 设置分析时段
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setanalysismode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetAnalysisMode — 设置分析模式
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        仿真控制命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="仿真控制命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#animate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Animate — 仿真控制
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setanimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetAnimation — 设置仿真参数
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#window2d-window3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Window2D / Window3D — 图形窗口
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        卫星命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="卫星命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setpropagator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetPropagator — 设置传播器
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setstate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetState — 设置轨道状态
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setattitude" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetAttitude — 设置姿态
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setvalue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetValue — 设置属性值
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#graphics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graphics — 图形设置
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        地面站命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="地面站命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setposition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetPosition — 设置地面站位置
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        传感器命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="传感器命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#define" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Define — 定义传感器视场
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Point — 设置传感器指向
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setconstraint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetConstraint — 设置传感器约束
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mcs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCS 命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MCS 命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#insertsegment-mcs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        InsertSegment — 插入 MCS 段
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#runmcs-mcs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RunMCS — 运行 MCS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#applyallprofilechanges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ApplyAllProfileChanges — 应用配置变更
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resetallprofiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ResetAllProfiles — 重置配置
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        报告命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="报告命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quickreport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QuickReport — 快速报告
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#report_rm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Report_RM — 获取数据报告
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Access — 可见性分析
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        覆盖分析命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="覆盖分析命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cov" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cov — 覆盖配置
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cov_rm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cov_RM — 获取覆盖报告
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        对象操作命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="对象操作命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rename" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rename — 重命名对象
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#copy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copy — 复制对象
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        单位设置命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="单位设置命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#units_setconnect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Units_SetConnect — 设置单位
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        概述
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        命令格式
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="命令格式">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        基本格式
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        参数分隔符
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        场景命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="场景命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New — 新建场景或对象
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#save-saveas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Save / SaveAs — 保存场景
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#load" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Load — 加载场景
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unload — 卸载对象或场景
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setanalysistimeperiod" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetAnalysisTimePeriod — 设置分析时段
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setanalysismode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetAnalysisMode — 设置分析模式
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        仿真控制命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="仿真控制命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#animate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Animate — 仿真控制
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setanimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetAnimation — 设置仿真参数
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#window2d-window3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Window2D / Window3D — 图形窗口
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        卫星命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="卫星命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setpropagator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetPropagator — 设置传播器
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setstate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetState — 设置轨道状态
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setattitude" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetAttitude — 设置姿态
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setvalue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetValue — 设置属性值
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#graphics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graphics — 图形设置
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        地面站命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="地面站命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setposition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetPosition — 设置地面站位置
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        传感器命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="传感器命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#define" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Define — 定义传感器视场
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Point — 设置传感器指向
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setconstraint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SetConstraint — 设置传感器约束
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mcs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCS 命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MCS 命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#insertsegment-mcs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        InsertSegment — 插入 MCS 段
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#runmcs-mcs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RunMCS — 运行 MCS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#applyallprofilechanges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ApplyAllProfileChanges — 应用配置变更
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resetallprofiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ResetAllProfiles — 重置配置
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        报告命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="报告命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quickreport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QuickReport — 快速报告
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#report_rm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Report_RM — 获取数据报告
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Access — 可见性分析
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        覆盖分析命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="覆盖分析命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cov" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cov — 覆盖配置
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cov_rm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cov_RM — 获取覆盖报告
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        对象操作命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="对象操作命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rename" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rename — 重命名对象
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#copy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copy — 复制对象
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        单位设置命令
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="单位设置命令">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#units_setconnect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Units_SetConnect — 设置单位
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="atk-connect">ATK Connect 命令参考<a class="headerlink" href="#atk-connect" title="Permanent link">&para;</a></h1>
+<h2 id="_1">概述<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>Connect 命令是 ATK 提供的一种文本命令接口，通过 TCP 连接发送命令字符串来操作 ATK 内部对象。</p>
+<h2 id="_2">命令格式<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="_3">基本格式<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Command &lt;ApplicationPath&gt; &lt;ObjectPath&gt; {Parameters}
+</code></pre></div>
+<h3 id="_4">参数分隔符<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>命令参数使用空格分隔，字符串参数使用引号：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>SetValue */Satellite/Sat1 &quot;Propagator&quot; Astromaster
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>SetAnalysisTimePeriod * &quot;1 Nov 2007 01:02:00.00&quot; &quot;1 Nov 2007 03:04:00.00&quot;
+</code></pre></div>
+<h2 id="_5">场景命令<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h3 id="new">New — 新建场景或对象<a class="headerlink" href="#new" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>New &lt;ApplicationPath&gt; &lt;ClassPath&gt; &lt;NewObjectName&gt; {NewOptions}
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NoDefault</code></td>
+<td>不创建默认子对象</td>
+</tr>
+<tr>
+<td><code>Ignore</code></td>
+<td>忽略错误</td>
+</tr>
+<tr>
+<td><code>CentralBody &lt;CBName&gt;</code></td>
+<td>指定中心天体</td>
+</tr>
+</tbody>
+</table>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>New / Scenario Scenario1                    # 新建场景
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>New / */Satellite Satellite1                # 新建卫星
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>New / */Facility GroundStation CentralBody Earth  # 新建地面站
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>New / */Satellite/Satellite1/Sensor Sensor1 # 新建卫星下传感器
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>New / */Facility/GroundStation/Sensor Sensor1  # 新建地面站下传感器
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>New / */Constellation/MyConstellation       # 新建星座容器
+</code></pre></div></p>
+<h3 id="save-saveas">Save / SaveAs — 保存场景<a class="headerlink" href="#save-saveas" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Save &lt;ApplicationPath&gt; &lt;ObjectPath&gt; [&quot;&lt;SaveInDirectory&gt;&quot;]
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>SaveAs &lt;ApplicationPath&gt; &lt;ObjectPath&gt; &quot;&lt;FilePath&gt;&quot;
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Save / *                                   # 保存当前场景
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>SaveAs / * &quot;C:/Users/Desktop/TestScen.xml&quot;  # 另存为
+</code></pre></div></p>
+<h3 id="load">Load — 加载场景<a class="headerlink" href="#load" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Load &lt;ApplicationPath&gt; {&lt;ClassPath&gt; | VDF} &quot;&lt;FilePath&gt;&quot;
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Load / Scenario &quot;E:/ATK/Scenario1.xml&quot;    # 加载场景文件
+</code></pre></div></p>
+<h3 id="unload">Unload — 卸载对象或场景<a class="headerlink" href="#unload" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Unload &lt;ApplicationPath&gt; &lt;ObjectPath&gt;
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Unload / */Satellite/Satellite1             # 删除卫星
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Unload / *                                  # 关闭场景
+</code></pre></div></p>
+<h3 id="setanalysistimeperiod">SetAnalysisTimePeriod — 设置分析时段<a class="headerlink" href="#setanalysistimeperiod" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>SetAnalysisTimePeriod &lt;ScenarioPath&gt; {TimeInterval}
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>SetAnalysisTimePeriod * &quot;1 Nov 2007 01:02:00.00&quot; &quot;1 Nov 2007 03:04:00.00&quot;
+</code></pre></div></p>
+<div class="admonition note">
+<p class="admonition-title">SDK 提示</p>
+<p><code>set_analysis_period()</code> 方法在设置时段后自动发送 <code>Animate * Reset</code> 重置动画时间线。</p>
+</div>
+<h3 id="setanalysismode">SetAnalysisMode — 设置分析模式<a class="headerlink" href="#setanalysismode" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>SetAnalysisMode &lt;ScenarioPath&gt; &quot;&lt;Mode&gt;&quot;
+</code></pre></div>
+<p><strong>模式</strong>：<code>Keplerian</code>、<code>Spice</code>、<code>Fixed</code></p>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>SetAnalysisMode */Scenario/Scenario1 &quot;Keplerian&quot;
+</code></pre></div></p>
+<h2 id="_6">仿真控制命令<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h3 id="animate">Animate — 仿真控制<a class="headerlink" href="#animate" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Animate &lt;ScenarioPath&gt; {AnimateOption} &lt;Parameters&gt;
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Start</code> / <code>Forward</code></td>
+<td>开始正向仿真</td>
+</tr>
+<tr>
+<td><code>Reverse</code></td>
+<td>反向仿真</td>
+</tr>
+<tr>
+<td><code>Pause</code> / <code>Stop</code></td>
+<td>暂停/停止仿真</td>
+</tr>
+<tr>
+<td><code>Reset</code></td>
+<td>重置仿真</td>
+</tr>
+<tr>
+<td><code>Faster</code></td>
+<td>加速</td>
+</tr>
+<tr>
+<td><code>Slower</code></td>
+<td>减速</td>
+</tr>
+</tbody>
+</table>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Animate * Start                            # 开始仿真
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>Animate * Pause                            # 暂停
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>Animate * Reset                            # 重置
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>Animate * Forward                          # 正向播放
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>Animate * Reverse                          # 反向播放
+</code></pre></div></p>
+<h3 id="setanimation">SetAnimation — 设置仿真参数<a class="headerlink" href="#setanimation" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>SetAnimation &lt;ScenarioPath&gt; {AnimateOption} &lt;Parameters&gt;
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CurrentTime &lt;TimeInstant&gt;</code></td>
+<td>设置当前时间</td>
+</tr>
+<tr>
+<td><code>AnimationMode {Normal\|RealTime\|XRealTime}</code></td>
+<td>设置仿真模式</td>
+</tr>
+<tr>
+<td><code>TimeStep &lt;Value&gt;</code></td>
+<td>设置步长</td>
+</tr>
+</tbody>
+</table>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>SetAnimation * AnimationMode XRealTime     # 设置为倍率模式
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>SetAnimation * TimeStep 60                 # 设置步长为 60 秒
+</code></pre></div></p>
+<h3 id="window2d-window3d">Window2D / Window3D — 图形窗口<a class="headerlink" href="#window2d-window3d" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>Window2D &lt;ScenarioPath&gt; &quot;&lt;WindowName&gt;&quot;
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>Window3D &lt;ScenarioPath&gt; &quot;&lt;WindowName&gt;&quot;
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>Window2D */Scenario/Scenario1 &quot;2D View&quot;
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>Window3D */Scenario/Scenario1 &quot;3D View&quot;
+</code></pre></div></p>
+<h2 id="_7">卫星命令<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<h3 id="setpropagator">SetPropagator — 设置传播器<a class="headerlink" href="#setpropagator" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>SetPropagator &lt;SatellitePath&gt; &lt;PropagatorName&gt;
+</code></pre></div>
+<p><strong>可用传播器</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>传播器</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TwoBody</code></td>
+<td>二体问题</td>
+</tr>
+<tr>
+<td><code>J2Perturbation</code></td>
+<td>J2 摄动</td>
+</tr>
+<tr>
+<td><code>J4Perturbation</code></td>
+<td>J4 摄动</td>
+</tr>
+<tr>
+<td><code>HPOP</code></td>
+<td>高精度轨道传播器</td>
+</tr>
+<tr>
+<td><code>SGP4</code></td>
+<td>SGP4（通过 TLE）</td>
+</tr>
+<tr>
+<td><code>Astromaster</code></td>
+<td>Astromaster</td>
+</tr>
+<tr>
+<td><code>LOP</code></td>
+<td>长期轨道预报</td>
+</tr>
+<tr>
+<td><code>Vinti</code></td>
+<td>Vinti</td>
+</tr>
+<tr>
+<td><code>Ballistic</code></td>
+<td>弹道</td>
+</tr>
+<tr>
+<td><code>GreatArc</code></td>
+<td>大弧段</td>
+</tr>
+<tr>
+<td><code>SimpleAscent</code></td>
+<td>简单上升段</td>
+</tr>
+<tr>
+<td><code>STKExternal</code></td>
+<td>STK 外部文件</td>
+</tr>
+</tbody>
+</table>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>SetPropagator */Satellite/Satellite1 Astromaster
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>SetPropagator */Satellite/Satellite1 TwoBody
+</code></pre></div></p>
+<h3 id="setstate">SetState — 设置轨道状态<a class="headerlink" href="#setstate" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>SetState &lt;SatellitePath&gt; &lt;StateType&gt; &lt;Parameters&gt;
+</code></pre></div>
+<p><strong>开普勒根数格式</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>SetState */Satellite/Sat1 Classical TwoBody &quot;1 Jan 2024 00:00:00.000&quot; &quot;1 Jan 2024 00:00:00.000&quot; 60 J2000 &quot;1 Jan 2024 00:00:00.000&quot; 7100 0.001 30 0 0 0
+</code></pre></div></p>
+<p>参数格式：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>Classical &lt;Propagator&gt; &quot;&lt;epoch&gt;&quot; &quot;&lt;stop&gt;&quot; &lt;Step&gt; &lt;CoordSys&gt; &quot;&lt;epoch&gt;&quot; &lt;SMA&gt; &lt;ECC&gt; &lt;INC&gt; &lt;RAAN&gt; &lt;ARGP&gt; &lt;TA&gt;
+</code></pre></div></p>
+<p><strong>笛卡尔坐标格式</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>SetState */Satellite/Sat1 Cartesian TwoBody &quot;1 Jan 2024 00:00:00.000&quot; &quot;1 Jan 2024 00:00:00.000&quot; 60 J2000 &quot;1 Jan 2024 00:00:00.000&quot; x y z vx vy vz
+</code></pre></div></p>
+<p><strong>TLE 格式</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>SetState */Satellite/Sat1 TLE &quot;&lt;Line1&gt;&quot; &quot;&lt;Line2&gt;&quot;
+</code></pre></div></p>
+<div class="admonition note">
+<p class="admonition-title">传播器限制</p>
+<p><code>Classical</code> 和 <code>Cartesian</code> 格式仅支持以下传播器：<code>TwoBody</code>、<code>J2Perturbation</code>、<code>J4Perturbation</code>、<code>HPOP</code>、<code>LOP</code>。TLE 格式自动使用 SGP4 传播器。</p>
+</div>
+<h3 id="setattitude">SetAttitude — 设置姿态<a class="headerlink" href="#setattitude" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>SetAttitude &lt;SatellitePath&gt; &quot;&lt;Type&gt;&quot; &lt;q1&gt; &lt;q2&gt; &lt;q3&gt; &lt;q4&gt;
+</code></pre></div>
+<p><strong>姿态类型</strong>：<code>CBF</code>、<code>J2000</code>、<code>NV</code>、<code>TLE</code></p>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>SetAttitude */Satellite/Sat1 &quot;J2000&quot; 0 0 0 1
+</code></pre></div></p>
+<h3 id="setvalue">SetValue — 设置属性值<a class="headerlink" href="#setvalue" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>SetValue &lt;ObjectPath&gt; &quot;&lt;PropertyPath&gt;&quot; &lt;Value&gt;
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>SetValue */Satellite/Sat1 &quot;MainSequence.SegmentList.Initial_State.InitialState.Keplerian.sma&quot; 7100
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>SetValue */Satellite/Sat1 &quot;MassProperties.TotalMass&quot; 500
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>SetValue */Satellite/Sat1 &quot;MassProperties.DryMass&quot; 400
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>SetValue */Satellite/Sat1 &quot;MassProperties.WetMass&quot; 500
+</code></pre></div></p>
+<h3 id="graphics">Graphics — 图形设置<a class="headerlink" href="#graphics" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>Graphics &lt;ObjectPath&gt; SetColor &lt;ColorIndex&gt;
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>Graphics */Satellite/Sat1 SetColor 12
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>Graphics */Facility/Station1 SetColor 5
+</code></pre></div></p>
+<h2 id="_8">地面站命令<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<h3 id="setposition">SetPosition — 设置地面站位置<a class="headerlink" href="#setposition" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>SetPosition &lt;FacilityPath&gt; Geodetic &lt;Lat&gt; &lt;Lon&gt; &lt;Height&gt;
+</code></pre></div>
+<p>参数说明：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>单位</th>
+<th>范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lat</td>
+<td>度</td>
+<td>-90 ~ +90</td>
+</tr>
+<tr>
+<td>Lon</td>
+<td>度</td>
+<td>-180 ~ +180</td>
+</tr>
+<tr>
+<td>Height</td>
+<td>米</td>
+<td>≥ 0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>SetPosition */Facility/Beijing Geodetic 39.9 116.4 50
+</code></pre></div></p>
+<h2 id="_9">传感器命令<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
+<h3 id="define">Define — 定义传感器视场<a class="headerlink" href="#define" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>Define &lt;SensorPath&gt; Conical &lt;ElStart&gt; &lt;ElEnd&gt; &lt;AzStart&gt; &lt;AzEnd&gt;
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>Define */Facility/Beijing/Sensor/Sensor1 Conical 5 85 0 360
+</code></pre></div></p>
+<h3 id="point">Point — 设置传感器指向<a class="headerlink" href="#point" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>Point &lt;SensorPath&gt; Fixed Euler &lt;Sequence&gt; &lt;A1&gt; &lt;A2&gt; &lt;A3&gt;
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>Point */Facility/Beijing/Sensor/Sensor1 Fixed Euler 123 180 0 0
+</code></pre></div></p>
+<h3 id="setconstraint">SetConstraint — 设置传感器约束<a class="headerlink" href="#setconstraint" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>SetConstraint &lt;SensorPath&gt; Range Max &lt;MaxRange&gt;
+</code></pre></div>
+<p>注意：<code>MaxRange</code> 单位为米。</p>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>SetConstraint */Facility/Beijing/Sensor/Sensor1 Range Max 2000000
+</code></pre></div></p>
+<h2 id="mcs">MCS 命令<a class="headerlink" href="#mcs" title="Permanent link">&para;</a></h2>
+<h3 id="insertsegment-mcs">InsertSegment — 插入 MCS 段<a class="headerlink" href="#insertsegment-mcs" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>InsertSegment &lt;SatellitePath&gt; &lt;SegmentType&gt; Segment_&lt;Index&gt;
+</code></pre></div>
+<p><strong>段类型</strong>：<code>Initial_State</code>、<code>Propagate</code>、<code>ImpulsiveBurn</code>、<code>TargetSequence</code></p>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>InsertSegment */Satellite/Sat1 Initial_State Segment_0
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>InsertSegment */Satellite/Sat1 Propagate Segment_1
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>InsertSegment */Satellite/Sat1 ImpulsiveBurn Segment_2
+<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a>InsertSegment */Satellite/Sat1 TargetSequence Segment_3
+</code></pre></div></p>
+<h3 id="runmcs-mcs">RunMCS — 运行 MCS<a class="headerlink" href="#runmcs-mcs" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>RunMCS &lt;SatellitePath&gt;
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>RunMCS */Satellite/Satellite1
+</code></pre></div></p>
+<h3 id="applyallprofilechanges">ApplyAllProfileChanges — 应用配置变更<a class="headerlink" href="#applyallprofilechanges" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>ApplyAllProfileChanges &lt;SatellitePath&gt;
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>ApplyAllProfileChanges */Satellite/Satellite1
+</code></pre></div></p>
+<h3 id="resetallprofiles">ResetAllProfiles — 重置配置<a class="headerlink" href="#resetallprofiles" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>ResetAllProfiles &lt;SatellitePath&gt;
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>ResetAllProfiles */Satellite/Satellite1
+</code></pre></div></p>
+<h2 id="_10">报告命令<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<h3 id="quickreport">QuickReport — 快速报告<a class="headerlink" href="#quickreport" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>QuickReport_&lt;Style&gt; &lt;ObjectPath&gt; {TimePeriod}
+</code></pre></div>
+<p>SDK 内部将报告样式名中的空格移除后拼接为命令名。例如样式 <code>"Position"</code> 对应命令 <code>QuickReport_Position</code>。</p>
+<p><strong>常见样式</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>样式名</th>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Position</code></td>
+<td><code>QuickReport_Position</code></td>
+<td>位置和速度</td>
+</tr>
+<tr>
+<td><code>Keplerian</code></td>
+<td><code>QuickReport_Keplerian</code></td>
+<td>开普勒根数</td>
+</tr>
+<tr>
+<td><code>J2000Position</code></td>
+<td><code>QuickReport_J2000Position</code></td>
+<td>J2000 位置</td>
+</tr>
+<tr>
+<td><code>J2000PositionVelocity</code></td>
+<td><code>QuickReport_J2000PositionVelocity</code></td>
+<td>J2000 位置速度</td>
+</tr>
+<tr>
+<td><code>LLA</code></td>
+<td><code>QuickReport_LLA</code></td>
+<td>经纬高</td>
+</tr>
+<tr>
+<td><code>Access</code></td>
+<td><code>QuickReport_Access</code></td>
+<td>可见性</td>
+</tr>
+<tr>
+<td><code>AER</code></td>
+<td><code>QuickReport_AER</code></td>
+<td>方位角/俯仰角/距离</td>
+</tr>
+</tbody>
+</table>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>QuickReport_Position */Satellite/Sat1 *
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>QuickReport_Keplerian */Satellite/Sat1 &quot;1 Jan 2024 00:00:00.000&quot; &quot;7 Jan 2024 00:00:00.000&quot;
+</code></pre></div></p>
+<h3 id="report_rm">Report_RM — 获取数据报告<a class="headerlink" href="#report_rm" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>Report_RM &lt;ObjectPath&gt; ({Option} &lt;Value&gt;)...
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Style "&lt;ReportStyleName&gt;"</code></td>
+<td>报告样式名称</td>
+</tr>
+<tr>
+<td><code>TimePeriod "&lt;Start&gt;" "&lt;Stop&gt;"</code></td>
+<td>分析时段</td>
+</tr>
+<tr>
+<td><code>TimeStep &lt;Value&gt;</code></td>
+<td>报告步长</td>
+</tr>
+</tbody>
+</table>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>Report_RM */Satellite/Satellite1 Style &quot;Position&quot; TimePeriod &quot;2023-07-29 09:19:01.000&quot; &quot;2023-07-29 10:09:38.000&quot;
+<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a>Report_RM */Satellite/Satellite1 Style &quot;J2000 Position Velocity&quot; TimeStep 60
+</code></pre></div></p>
+<h3 id="access">Access — 可见性分析<a class="headerlink" href="#access" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>Access &lt;ObjectPath&gt; &lt;AccessObjectPath&gt; {TimePeriod &lt;StartTime&gt; &lt;StopTime&gt;}
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>Access */Satellite/Satellite1 */Facility/GroundStation TimePeriod &quot;14 Mar 2024 00:00:00.000&quot; &quot;15 Mar 2024 00:00:00.000&quot;
+</code></pre></div></p>
+<h2 id="_11">覆盖分析命令<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<h3 id="cov">Cov — 覆盖配置<a class="headerlink" href="#cov" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>Cov &lt;CovDefnObjectPath&gt; Asset &lt;AssetObjectPath&gt; {Action}
+<a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a>Cov &lt;CovDefnObjectPath&gt; Facility &lt;FacilityObjectPath&gt; {Action}
+<a id="__codelineno-55-3" name="__codelineno-55-3" href="#__codelineno-55-3"></a>Cov &lt;CovDefnObjectPath&gt; Grid &quot;&lt;GridType&gt;&quot; &lt;LatStep&gt; &lt;LonStep&gt;
+<a id="__codelineno-55-4" name="__codelineno-55-4" href="#__codelineno-55-4"></a>Cov &lt;CovDefnObjectPath&gt; FOM &quot;&lt;FomName&gt;&quot;
+<a id="__codelineno-55-5" name="__codelineno-55-5" href="#__codelineno-55-5"></a>Cov &lt;CovDefnObjectPath&gt; Compute {TimePeriod}
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>Cov */CoverageDefinition/Coverage1 Asset */Satellite/Satellite1 Assign
+<a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a>Cov */CoverageDefinition/Coverage1 Facility */Facility/Station1 Assign
+<a id="__codelineno-56-3" name="__codelineno-56-3" href="#__codelineno-56-3"></a>Cov */CoverageDefinition/Coverage1 Grid &quot;LatLon&quot; 1.0 1.0
+<a id="__codelineno-56-4" name="__codelineno-56-4" href="#__codelineno-56-4"></a>Cov */CoverageDefinition/Coverage1 Compute *
+</code></pre></div></p>
+<h3 id="cov_rm">Cov_RM — 获取覆盖报告<a class="headerlink" href="#cov_rm" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>Cov_RM &lt;ObjectPath&gt; Access Compute &quot;&lt;ReportStyle&gt;&quot; [{TimeIntervals}]
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>Cov_RM */Satellite/Satellite1 Access Compute &quot;Coverage&quot; &quot;14 Mar 2024 00:00:00.000&quot; &quot;15 Mar 2024 00:00:00.000&quot;
+</code></pre></div></p>
+<h2 id="_12">对象操作命令<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
+<h3 id="rename">Rename — 重命名对象<a class="headerlink" href="#rename" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>Rename &lt;ObjectPath&gt; &lt;NewName&gt;
+</code></pre></div>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>Rename */Satellite/Satellite1 Sat1
+</code></pre></div></p>
+<h3 id="copy">Copy — 复制对象<a class="headerlink" href="#copy" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>Copy &lt;ApplicationPath&gt; &lt;CopyFromObjectPath&gt; [{CopyOption}]
+</code></pre></div>
+<p><strong>选项</strong>：
+- <code>Name &lt;NewName&gt;</code>：新对象名称
+- <code>Path &lt;NewObjectPath&gt;</code>：新对象路径</p>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>Copy / Satellite/Satellite1 Name Satellite2
+</code></pre></div></p>
+<h2 id="_13">单位设置命令<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h2>
+<h3 id="units_setconnect">Units_SetConnect — 设置单位<a class="headerlink" href="#units_setconnect" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>Units_SetConnect &lt;AppOrScenPath&gt; {Default | {Dimension} {Unit}...}
+</code></pre></div>
+<p><strong>维度</strong>：<code>Date</code>, <code>Distance</code>, <code>Time</code>, <code>Angle</code></p>
+<p><strong>示例</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>Units_SetConnect / Date JDate                        # 日期格式
+<a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a>Units_SetConnect / Distance km                       # 距离单位
+<a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a>Units_SetConnect / Time sec                          # 时间单位
+</code></pre></div></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
