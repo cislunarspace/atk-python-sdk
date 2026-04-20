@@ -20,7 +20,7 @@ This is a **third-party** ATK Python SDK that complements and extends the offici
 ## Installation
 
 ```bash
-pip install -e .
+uv sync
 ```
 
 This installs the `atk` package in editable mode and makes `vendored/` available
@@ -164,14 +164,14 @@ atk-python-sdk/
 构建文档：
 
 ```bash
-pip install -e ".[docs]"
+uv sync --extra docs
 mkdocs serve
 ```
 
 ## Running Tests
 
 ```bash
-pip install -e ".[dev]"
+uv sync --dev
 python -m pytest src/tests/ -v
 ```
 
