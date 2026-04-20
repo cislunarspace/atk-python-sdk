@@ -135,3 +135,21 @@ class TestATKConnectionManager:
             mgr = ATKConnectionManager(retries=2, backoff=0.01)
             with pytest.raises(atk_exc.ATKConnectionError, match="Failed after 2 attempts"):
                 mgr.connect()
+
+
+class TestConnectionPatching:
+    """Verify all submodules' monkey patches are correctly applied to ATKConnection."""
+
+    def test_all_builder_methods_exist_on_connection(self):
+        """Verify create_scenario, create_satellite, mcs_builder, create_facility, create_coverage all exist on ATKConnection."""
+        from atk.connect import session
+        expected_methods = [
+            "create_scenario",
+            "create_satellite",
+            "mcs_builder",
+            "create_facility",
+            "create_coverage",
+        ]
+        for method_name in expected_methods:
+            assert hasattr(session.ATKConnection, method_name), \
+                f"ATKConnection missing method: {method_name}"
