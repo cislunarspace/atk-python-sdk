@@ -32,7 +32,7 @@ try:
 except ImportError as _exc:  # pragma: no cover
     raise ImportError(
         "ATKConnectModule not found in src/vendored/. "
-        "Ensure the SDK is installed with: pip install -e ."
+        "Ensure the SDK is installed with: uv sync"
     ) from _exc
 
 
