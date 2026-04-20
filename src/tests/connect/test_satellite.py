@@ -76,6 +76,33 @@ class TestSatelliteBuilder:
         # TLE SetState 后必须重置动画
         assert ("Animate", "*", " Reset") in conn.calls
 
+    def test_set_state_tle_rejects_short_line1(self):
+        from atk.connect.satellite import SatelliteBuilder
+        from atk import exceptions as atk_exc
+
+        conn = MockATKConnection()
+        sat = SatelliteBuilder(conn, "Sat1")
+
+        # line1 is only 52 chars (too short, must be 69)
+        short_line1 = "1 25544U 98067A   24001.50000000  .00016717  00000-0"
+        line2 = "2 25544  51.6400 208.9163 0006703  44.2800 315.9700 15.49000000400000"
+
+        with pytest.raises(atk_exc.ATKValueError, match="69 characters"):
+            sat.set_state_tle(line1=short_line1, line2=line2)
+
+    def test_set_state_tle_rejects_short_line2(self):
+        from atk.connect.satellite import SatelliteBuilder
+        from atk import exceptions as atk_exc
+
+        conn = MockATKConnection()
+        sat = SatelliteBuilder(conn, "Sat1")
+
+        line1 = "1 25544U 98067A   24001.50000000  .00016717  00000-0  10270-3 0  9000"
+        short_line2 = "2 25544  51.6400 208.9163 0006703"  # only 32 chars
+
+        with pytest.raises(atk_exc.ATKValueError, match="69 characters"):
+            sat.set_state_tle(line1=line1, line2=short_line2)
+
     def test_set_mass(self) -> None:
         from atk.connect.satellite import SatelliteBuilder
 

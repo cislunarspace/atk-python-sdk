@@ -36,6 +36,19 @@ _PROPAGATOR_CMD_MAP = {
 # SetState Classical/Cartesian 支持的传播器（ATK 文档）
 _STATE_PROPAGATORS = {"TwoBody", "J2Perturbation", "J4Perturbation", "HPOP", "LOP"}
 
+_TLE_LINE_LENGTH = 69
+
+def _validate_tle_line(line: str, label: str) -> None:
+    """Validate TLE line is exactly 69 characters (standard CCSDS TLE format)."""
+    if not isinstance(line, str):
+        raise _ex.ATKValueError(f"TLE {label} must be a string, got {type(line).__name__}")
+    line_stripped = line.strip()
+    if len(line_stripped) != _TLE_LINE_LENGTH:
+        raise _ex.ATKValueError(
+            f"TLE {label} must be exactly {_TLE_LINE_LENGTH} characters, "
+            f"got {len(line_stripped)}: {line_stripped!r}"
+        )
+
 
 class SatelliteBuilder:
     """
@@ -255,6 +268,8 @@ class SatelliteBuilder:
         -------
         self
         """
+        _validate_tle_line(line1, "line1")
+        _validate_tle_line(line2, "line2")
         self._conn.send("SetState", self._path, f' TLE "{line1}" "{line2}"')
         self._conn.send("Animate", "*", " Reset")
         return self
