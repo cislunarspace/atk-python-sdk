@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "atk-sdk"
@@ -38,19 +38,11 @@ docs = [
 Homepage = "https://github.com/cislunarspace/atk-python-sdk"
 Documentation = "https://cislunarspace.github.io/atk-python-sdk"
 
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["atk*"]
-exclude = ["atk.*.tests*"]
-
-[tool.setuptools.package-dir]
-"" = "src"
-
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
 version_variables = ["src/atk/__init__.py:__version__"]
 changelog_file = "CHANGELOG.md"
-build_command = "pip install build && python -m build"
+build_command = "uv build"
 upload_to_pypi = false
 remove_dist = false
 
