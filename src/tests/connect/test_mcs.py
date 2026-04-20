@@ -1,6 +1,7 @@
 """
 atk.connect.mcs 的单元测试 — McsBuilder。
 """
+# pyright: reportArgumentType=none
 
 import pytest
 from unittest.mock import MagicMock

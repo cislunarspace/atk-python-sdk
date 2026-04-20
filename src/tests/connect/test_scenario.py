@@ -1,6 +1,7 @@
 """
 atk.connect.scenario 的单元测试 — ScenarioBuilder。
 """
+# pyright: reportArgumentType=none
 
 import pytest
 from unittest.mock import MagicMock, patch

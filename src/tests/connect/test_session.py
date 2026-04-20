@@ -44,7 +44,7 @@ class TestATKConnectionSend:
         from atk import exceptions as atk_exc
 
         conn = ATKConnection(con_id=1, host="127.0.0.1", port=6655)
-        conn._connected = False
+        conn._connected = False  # type: ignore[reportAttributeAccessIssue]
 
         with pytest.raises(atk_exc.ATKConnectionError, match="Connection is closed"):
             conn.send("New", "*", "")
@@ -78,7 +78,7 @@ class TestATKConnectionClose:
         with patch("atk.connect.session._ATK") as mock_atk:
             from atk.connect.session import ATKConnection
             conn = ATKConnection(con_id=42, host="127.0.0.1", port=6655)
-            conn._connected = False  # 已关闭
+            conn._connected = False  # type: ignore[reportAttributeAccessIssue]
 
             conn.close()  # 不应再次调用 atkClose
             mock_atk.atkClose.assert_not_called()
@@ -92,7 +92,7 @@ class TestConnectionContextManager:
             mock_atk.atkOpen.return_value = 99
 
             from atk.connect.session import connect
-            with connect() as conn:
+            with connect() as conn:  # type: ignore[reportGeneralTypeIssues]
                 assert conn.con_id == 99
                 assert conn.is_connected is True
 
@@ -104,7 +104,7 @@ class TestConnectionContextManager:
 
             from atk.connect.session import connect
             with pytest.raises(RuntimeError):
-                with connect() as conn:
+                with connect():  # type: ignore[reportGeneralTypeIssues]
                     raise RuntimeError("test error")
 
             mock_atk.atkClose.assert_called_once_with(99)

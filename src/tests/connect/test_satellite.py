@@ -1,9 +1,9 @@
 """
 atk.connect.satellite 的单元测试 — SatelliteBuilder。
 """
+# pyright: reportArgumentType=none
 
 import pytest
-from unittest.mock import MagicMock
 
 from tests.connect.conftest import MockATKConnection
 

@@ -30,7 +30,7 @@ class IAtkObjectRoot:
     def CloseScenario(self):
         self._scenario = None
 
-    def SaveScenario(self, path: str = None):
+    def SaveScenario(self, path: str | None = None):
         pass
 
     def GetObjectFromPath(self, path: str):
@@ -42,7 +42,7 @@ class IAtkObjectRoot:
     def GetAnimation(self):
         return MagicMock()
 
-    def OutputDataReport(self, obj, report_type: str, start: str, stop: str, output_path: str = None):
+    def OutputDataReport(self, obj, report_type: str, start: str, stop: str, output_path: str | None = None):
         return output_path or "default_report.txt"
 
 

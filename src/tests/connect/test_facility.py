@@ -1,9 +1,9 @@
 """
 atk.connect.facility 的单元测试 — FacilityBuilder 和 SensorBuilder。
 """
+# pyright: reportArgumentType=none
 
 import pytest
-from unittest.mock import MagicMock
 
 from tests.connect.conftest import MockATKConnection
 
