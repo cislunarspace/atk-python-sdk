@@ -5,12 +5,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build & Test Commands
 
 ```bash
-pip install -e ".[dev]"              # install with dev dependencies
+uv sync --dev              # install with dev dependencies
 python -m pytest src/tests/ -v       # run all tests
 python -m pytest src/tests/test_utils.py -v                          # single file
 python -m pytest src/tests/test_utils.py::TestParseAtkTime::test_full_datetime -v  # single test
 python -m pytest src/tests/ -v --cov=src --cov-report=term-missing  # with coverage
-pip install -e ".[docs]" && mkdocs serve  # build docs locally
+uv sync --extra docs && mkdocs serve  # build docs locally
 ```
 
 No linter or formatter is configured. No CI pipeline exists.
