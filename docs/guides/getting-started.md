@@ -5,7 +5,7 @@
 ### 基本安装
 
 ```bash
-pip install -e .
+uv sync
 ```
 
 这会安装 `atk` 包并使其 `vendored/` 目录可导入。
@@ -13,7 +13,7 @@ pip install -e .
 ### 开发安装
 
 ```bash
-pip install -e ".[dev]"
+uv sync --dev
 ```
 
 这会额外安装测试依赖。
